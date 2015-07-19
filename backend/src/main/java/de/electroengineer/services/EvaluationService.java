@@ -49,26 +49,24 @@ public class EvaluationService {
         int countMeasurePoints = evaluation.getX().size();
         int skip = countMeasurePoints / 1000;
 
-        List<Double> x = generatePreview(evaluation.getX(), countMeasurePoints, skip);
-        List<Double> v = generatePreview(evaluation.getV(), countMeasurePoints, skip);
-        List<Double> a = generatePreview(evaluation.getA(), countMeasurePoints, skip);
+        List<Double> x = generatePreview(evaluation.getX(), skip);
+        List<Double> v = generatePreview(evaluation.getV(), skip);
+        List<Double> a = generatePreview(evaluation.getA(), skip);
 
         evaluation.setX(x);
         evaluation.setV(v);
         evaluation.setA(a);
     }
 
-    private List<Double> generatePreview(List<Double> measurePoints, int countMeasurePoints, int skip) {
-        return IntStream.range(0, countMeasurePoints)
+    private List<Double> generatePreview(List<Double> measurePoints, int skip) {
+        return IntStream.range(0, measurePoints.size())
                 .filter(i -> i % skip == 0)
-                .mapToObj(i -> measurePoints.get(i))
+                .mapToObj(measurePoints::get)
                 .collect(Collectors.toList());
     }
 
     private Evaluation parseJsonToEvaluation(String json) {
-        Gson gson = new Gson();
-        Evaluation evaluation = gson.fromJson(json, Evaluation.class);
-        return evaluation;
+        return new Gson().fromJson(json, Evaluation.class);
     }
 
     private static String readFileAndDecompress(String evaluationName) throws IOException {
