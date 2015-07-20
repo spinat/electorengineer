@@ -23,9 +23,16 @@ angular
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl'
+      .when('/evaluation/:evaluationName', {
+        templateUrl: 'views/evaluation_details.html',
+        controller: 'EvaluationDetailsCtrl',
+        resolve: {
+          Evaluation: function($route, EvaluationService) {
+            var evaluationName = $route.current.params.evaluationName;
+            return EvaluationService.getEvaluation(evaluationName);
+          }
+        }
+
       })
       .otherwise({
         redirectTo: '/'
