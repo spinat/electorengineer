@@ -4,18 +4,12 @@ import java.util.Date;
 
 public class Measure {
 
-    private Long id;
-
     private String measureName;
     private String channelName;
     private Date created = new Date();
     private String unit;
     private Double sampleIntervall;
     private Integer sampleCount;
-
-    public Long getId() {
-        return id;
-    }
 
     public String getMeasureName() {
         return measureName;
@@ -52,8 +46,7 @@ public class Measure {
     @Override
     public String toString() {
         return "Measure{" +
-                "id=" + id +
-                ", measureName='" + measureName + '\'' +
+                "measureName='" + measureName + '\'' +
                 ", channelName='" + channelName + '\'' +
                 ", created=" + created +
                 ", unit='" + unit + '\'' +

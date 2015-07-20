@@ -37,4 +37,7 @@ angular
       .otherwise({
         redirectTo: '/'
       });
+  })
+  .config(function($logProvider){
+    $logProvider.debugEnabled(true);
   });

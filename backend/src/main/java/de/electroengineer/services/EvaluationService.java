@@ -1,18 +1,17 @@
 package de.electroengineer.services;
 
 import com.google.gson.Gson;
+import de.electroengineer.domain.Coordinate;
 import de.electroengineer.domain.Evaluation;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
 
 @Service
@@ -25,7 +24,7 @@ public class EvaluationService {
         String json = readFileAndDecompress(evaluationName);
         Evaluation evaluation = parseJsonToEvaluation(json);
 
-        minimizeCoordinates(evaluation);
+        generatePreviewData(evaluation);
 
         return evaluation;
     }
@@ -44,25 +43,16 @@ public class EvaluationService {
         return evaluations;
     }
     
-    private void minimizeCoordinates(Evaluation evaluation) {
-
-        int countMeasurePoints = evaluation.getX().size();
+    private void generatePreviewData(Evaluation evaluation) {
+        int countMeasurePoints = evaluation.getData().size();
         int skip = countMeasurePoints / 1000;
 
-        List<Double> x = generatePreview(evaluation.getX(), skip);
-        List<Double> v = generatePreview(evaluation.getV(), skip);
-        List<Double> a = generatePreview(evaluation.getA(), skip);
-
-        evaluation.setX(x);
-        evaluation.setV(v);
-        evaluation.setA(a);
-    }
-
-    private List<Double> generatePreview(List<Double> measurePoints, int skip) {
-        return IntStream.range(0, measurePoints.size())
+        List<Coordinate> coordinates = IntStream.range(0, evaluation.getData().size())
                 .filter(i -> i % skip == 0)
-                .mapToObj(measurePoints::get)
+                .mapToObj(i -> evaluation.getData().get(i))
                 .collect(Collectors.toList());
+
+        evaluation.setData(coordinates);
     }
 
     private Evaluation parseJsonToEvaluation(String json) {

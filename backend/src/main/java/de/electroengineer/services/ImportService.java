@@ -1,6 +1,7 @@
 package de.electroengineer.services;
 
 import com.google.gson.Gson;
+import de.electroengineer.domain.Coordinate;
 import de.electroengineer.domain.Evaluation;
 import de.electroengineer.domain.Measure;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 
@@ -60,16 +62,21 @@ public class ImportService {
 
         //Collect Data
         Evaluation evaluation = new Evaluation();
+
+        //Geht bestimmt irgendwie hübscher
+        List<Double> voltData = new ArrayList<>();
+        List<Double> ampereData = new ArrayList<>();
+
         paths.stream()
                 .forEach(path -> {
                     HashMap<String, Object> metaData = extractMetaDataFromFile(path);
                     Measure measure = createMeasure(path, metaData);
                     switch (measure.getUnit().toLowerCase()) {
                         case "a":
-                            evaluation.setA(extractMeasureDataFromFile(path));
+                            ampereData.addAll(extractMeasureDataFromFile(path));
                             break;
                         case "v":
-                            evaluation.setV(extractMeasureDataFromFile(path));
+                            voltData.addAll(extractMeasureDataFromFile(path));
                             break;
                         default:
                             LOG.error("Unknown measure Unit! Measure.Unit={}", measure.getUnit());
@@ -78,7 +85,8 @@ public class ImportService {
                     evaluation.getMeasures().add(measure);
                 });
 
-        evaluation.setX(generateXCoordinates(evaluation));
+        List<Coordinate> coordinates = generateCoordinates(voltData, ampereData, evaluation.getMeasures().get(0).getSampleIntervall());
+        evaluation.setData(coordinates);
 
         Gson gson = new Gson();
         String json = gson.toJson(evaluation);
@@ -95,29 +103,25 @@ public class ImportService {
         return;
     }
 
-    private List<Double> generateXCoordinates(Evaluation evaluation) {
-        Measure maxSampleCountMeasure = evaluation.getMeasures().stream()
-                .max((m1, m2) -> Integer.compare(m1.getSampleCount(), m2.getSampleCount()))
-                .get();
+    private List<Coordinate> generateCoordinates(List<Double> voltData, List<Double> ampereData, Double sampleIntervall) {
 
-        if(maxSampleCountMeasure == null) {
-            LOG.error("Measures has no sample count. Can not generate x coordinates.");
-            return null;
-        }
+        int min = voltData.size() > ampereData.size() ? ampereData.size()  : voltData.size();
 
-        Integer sampleCount = maxSampleCountMeasure.getSampleCount();
-        Double sampleIntervall = maxSampleCountMeasure.getSampleIntervall();
+        List<Coordinate> coordinates = IntStream.range(0, min)
+                .mapToObj(i -> {
+                    Coordinate coordinate = new Coordinate();
+                    coordinate.setAmpere(ampereData.get(i));
+                    coordinate.setVolt(voltData.get(i));
+                    coordinate.setTime(i * sampleIntervall);
+                    return coordinate;
+                })
+                .collect(Collectors.toList());
 
-        List<Double> xCoordinates = new ArrayList<>();
-        for(int i = 0; i < sampleCount; i++) {
-            xCoordinates.add(i * sampleIntervall);
-        }
-        return xCoordinates;
+        return coordinates;
     }
 
-    private Measure createMeasure(Path path, HashMap<String, Object> metaData) {
+    private static Measure createMeasure(Path path, HashMap<String, Object> metaData) {
         Measure measure = new Measure();
-
         measure.setMeasureName(path.getFileName().toString());
         measure.setChannelName(getMetaDataAsString("ChannelName", metaData));
         measure.setUnit(getMetaDataAsString("Unit", metaData));
@@ -125,7 +129,6 @@ public class ImportService {
         measure.setSampleCount(getMetaDataAsInteger("SampleCount", metaData));
         return measure;
     }
-
 
     private static Integer getMetaDataAsInteger(String attributeName, HashMap<String, Object> metaData) {
         return Integer.parseInt(metaData.get(attributeName).toString());
