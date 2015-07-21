@@ -8,48 +8,7 @@ angular.module('frontendApp')
     var margin = {top: 20, right: 20, bottom: 30, left: 50};
     var width = 960 - margin.left - margin.right;
     var height = 500 - margin.top - margin.bottom;
-
     var svg;
-
-    var xScale, xAxis;
-    var vScale, vAxis, vLine;
-    //var aScale, aAxis, aLine;
-
-    function configureX(min, max) {
-      $log.info('min', min, 'max', max);
-
-      xScale = d3.scale.linear()
-        .range([0, width])
-        .domain([min, max]);
-
-      xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient('bottom')
-        .ticks(10);
-    }
-
-    function configureV(min, max) {
-      $log.info('min', min, 'max', max);
-
-      vScale = d3.scale.linear()
-        .range([0, width])
-        .domain([min, max]);
-
-      vAxis = d3.svg.axis()
-        .scale(vScale)
-        .orient('left')
-        .ticks(10);
-
-      vLine = d3.svg.line()
-        .x(function (d) {
-          //$log.info('data', d.x);
-          return xScale(d.time);
-        })
-        .y(function (d) {
-          return vScale(d.volt);
-        });
-    }
-
 
     return {
 
@@ -57,38 +16,65 @@ angular.module('frontendApp')
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
 
         var rawSvg=$element.find('svg');
-        rawSvg.attr('width', width + margin.left + margin.right);
-        rawSvg.attr('height', height + margin.top + margin.bottom);
         svg = d3.select(rawSvg[0]);
 
-        //svg
-        //  .append('g')
-        //  .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        svg = svg.attr('width', width + margin.left + margin.right)
+          .attr('height', height + margin.top + margin.bottom)
+          .append('g')
+          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-        configureX(_.min($scope.evaluation.data, 'time').time, _.max($scope.evaluation.data, 'time').time);
-        configureV(_.min($scope.evaluation.data, 'volt').volt, _.max($scope.evaluation.data, 'volt').volt);
+        var x = d3.scale.linear()
+          .range([0, width]);
 
-        //Axen
-        svg.append('svg:g')
+        var y = d3.scale.linear()
+          .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+          .scale(x)
+          .orient('bottom');
+
+        var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient('left');
+
+        var line = d3.svg.line()
+          .x(function(d) { return x(d.time); })
+          .y(function(d) { return y(d.volt); });
+
+        x.domain([
+          _.min($scope.evaluation.data, 'time').time,
+          _.max($scope.evaluation.data, 'time').time
+        ]);
+
+        y.domain([
+          _.min($scope.evaluation.data, 'volt').volt,
+          _.max($scope.evaluation.data, 'volt').volt
+        ]);
+
+        svg.append('g')
           .attr('class', 'x axis')
           .attr('transform', 'translate(0,' + height + ')')
           .call(xAxis);
 
-        svg.append('svg:g')
+        svg.append('g')
           .attr('class', 'y axis')
-          .attr('transform', 'translate(' + width + ', 0)')
-          .call(vAxis);
+          .call(yAxis)
+          .append('text')
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 6)
+          .attr('dy', '.71em')
+          .style('text-anchor', 'end')
+          .text('Temperature (ºF)');
 
         svg.append('svg:path')
           .attr({
-            d: vLine($scope.evaluation.data),
-            'stroke': 'blue',
-            'stroke-width': 1.5,
-            'opacity': 0.9,
-            'fill': 'none',
-            'class': 'path'
-          });
-
+              d: line($scope.evaluation.data),
+              'stroke': 'blue',
+              'stroke-width': 1.5,
+              'opacity': 0.9,
+              'fill': 'none',
+              'class': 'path'
+            });
       },
 
       template: '<svg width="0" height="0"></svg>',
