@@ -78,48 +78,49 @@ angular.module('frontendApp')
         .text('Strom (A)');
     }
 
+    function drawData(evaluation) {
+      scaleTime.domain([
+        _.min(evaluation.data, 'time').time,
+        _.max(evaluation.data, 'time').time
+      ]);
+
+      scaleVolt.domain([
+        _.min(evaluation.data, 'volt').volt,
+        _.max(evaluation.data, 'volt').volt
+      ]);
+
+      scaleAmpere.domain([
+        _.min(evaluation.data, 'ampere').ampere,
+        _.max(evaluation.data, 'ampere').ampere
+      ]);
+
+      svg.append('svg:path')
+        .attr({
+          d: lineVolt(evaluation.data),
+          'stroke': 'blue',
+          'stroke-width': 1.5,
+          'opacity': 0.9,
+          'fill': 'none',
+          'class': 'path'
+        });
+
+      svg.append('svg:path')
+        .attr({
+          d: lineAmpere(evaluation.data),
+          'stroke': 'red',
+          'stroke-width': 1.5,
+          'opacity': 0.9,
+          'fill': 'none',
+          'class': 'path'
+        });
+    }
     return {
 
       controller: function($log, $element, $scope) {
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
 
         drawDiagram($element);
-
-
-        scaleTime.domain([
-          _.min($scope.evaluation.data, 'time').time,
-          _.max($scope.evaluation.data, 'time').time
-        ]);
-
-        scaleVolt.domain([
-          _.min($scope.evaluation.data, 'volt').volt,
-          _.max($scope.evaluation.data, 'volt').volt
-        ]);
-
-        scaleAmpere.domain([
-          _.min($scope.evaluation.data, 'ampere').ampere,
-          _.max($scope.evaluation.data, 'ampere').ampere
-        ]);
-
-        svg.append('svg:path')
-          .attr({
-              d: lineVolt($scope.evaluation.data),
-              'stroke': 'blue',
-              'stroke-width': 1.5,
-              'opacity': 0.9,
-              'fill': 'none',
-              'class': 'path'
-            });
-
-        svg.append('svg:path')
-          .attr({
-            d: lineAmpere($scope.evaluation.data),
-            'stroke': 'red',
-            'stroke-width': 1.5,
-            'opacity': 0.9,
-            'fill': 'none',
-            'class': 'path'
-          });
+        drawData($scope.evaluation);
 
       },
 
