@@ -43,11 +43,11 @@ public class FileService {
         return parseJsonToEvaluation(json);
     }
 
-    public void storeEvaluation(Evaluation evaluation, String fileName) {
+    public void storeEvaluation(Evaluation evaluation) {
         Gson gson = new Gson();
         String json = gson.toJson(evaluation);
 
-        try(FileOutputStream output = new FileOutputStream(DATA_FOLDER + fileName + COMPRESS_FILE_EXTENSION)) {
+        try(FileOutputStream output = new FileOutputStream(DATA_FOLDER + evaluation.getEvaluationName() + COMPRESS_FILE_EXTENSION)) {
             Writer writer = new OutputStreamWriter(new GZIPOutputStream(output), "UTF-8");
             writer.write(json);
             writer.close();

@@ -5,10 +5,19 @@ import java.util.List;
 
 public class Evaluation {
 
+    private String evaluationName;
+    private Coordinate t1Start;
+
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
 
-    private Coordinate t1Start;
+    public String getEvaluationName() {
+        return evaluationName;
+    }
+
+    public void setEvaluationName(String evaluationName) {
+        this.evaluationName = evaluationName;
+    }
 
     public Coordinate getT1Start() {
         return t1Start;

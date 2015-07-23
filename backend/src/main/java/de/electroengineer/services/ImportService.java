@@ -85,8 +85,9 @@ public class ImportService {
 
         List<Coordinate> coordinates = generateCoordinates(voltData, ampereData, evaluation.getMeasures().get(0).getSampleIntervall());
         evaluation.setData(coordinates);
+        evaluation.setEvaluationName(extractGroupName(paths.get(0).getFileName().toString()));
 
-        fileService.storeEvaluation(evaluation, extractGroupName(paths.get(0).getFileName().toString()));
+        fileService.storeEvaluation(evaluation);
 
         return;
     }

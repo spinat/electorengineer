@@ -2,6 +2,7 @@ package de.electroengineer.controllers;
 
 import de.electroengineer.domain.Evaluation;
 import de.electroengineer.services.EvaluationService;
+import de.electroengineer.services.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class EvaluationController {
 
     @Autowired
     EvaluationService evaluationService;
+
+    @Autowired
+    FileService fileService;
 
     @RequestMapping(API_EVALUATION_LIST)
     public List<String> listEvaluation() throws IOException {
@@ -47,6 +51,8 @@ public class EvaluationController {
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
         evaluationService.calc(evaluation);
+
+        fileService.storeEvaluation(evaluation);
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
