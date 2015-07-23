@@ -60,18 +60,18 @@ public class EvaluationService {
                 .get()
                 .getAmpere();
 
-        final Double min = Math.pow(totalMinAmpere > 0 ? totalMaxAmpere : 0d, 2);
-        final Double max = Math.pow(totalMaxAmpere, 2);
+        final Double min = Math.pow(totalMinAmpere > 0 ? totalMaxAmpere : 0d, 1);
+        final Double max = Math.pow(totalMaxAmpere, 1);
 
         List<Double> normedMeasurePointsTotal = evaluation.getData().stream()
                 .map(Coordinate::getAmpere)             //Strom
                 .map(value -> value > 0 ? value : 0)    //Negativer Strom auf 0 setzen
-                .map(value -> value * value)            //Quadieren für die Genauigkeit
+//                .map(value -> value * value)            //Quadieren für die Genauigkeit
                 .map(val -> 100.0f * ((val - min) / (max - min))) //Normieren auf 100%
                 .collect(Collectors.toList());
 
         OptionalInt firstIndex = IntStream.range(0, normedMeasurePointsTotal.size())
-                .filter(i -> normedMeasurePointsTotal.get(i) > 0.01)
+                .filter(i -> normedMeasurePointsTotal.get(i) > 1)
                 .findFirst();
 
         return evaluation.getData().get(firstIndex.getAsInt());

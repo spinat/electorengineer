@@ -14,7 +14,7 @@ angular.module('frontendApp')
     var axisTime, axisVolt, axisAmpere;
     var lineVolt, lineAmpere;
 
-    function drawDiagram(element) {
+    function drawDiagram(element, evaluation) {
       var rawSvg=element.find('svg');
       svg = d3.select(rawSvg[0]);
 
@@ -52,6 +52,21 @@ angular.module('frontendApp')
         .x(function(d) { return scaleTime(d.time); })
         .y(function(d) { return scaleAmpere(d.ampere); });
 
+      scaleTime.domain([
+        _.min(evaluation.data, 'time').time,
+        _.max(evaluation.data, 'time').time
+      ]);
+
+      scaleVolt.domain([
+        _.min(evaluation.data, 'volt').volt,
+        _.max(evaluation.data, 'volt').volt
+      ]);
+
+      scaleAmpere.domain([
+        _.min(evaluation.data, 'ampere').ampere,
+        _.max(evaluation.data, 'ampere').ampere
+      ]);
+
       svg.append('g')
         .attr('class', 'x axis')
         .attr('transform', 'translate(0,' + height + ')')
@@ -79,21 +94,6 @@ angular.module('frontendApp')
     }
 
     function drawData(evaluation) {
-      scaleTime.domain([
-        _.min(evaluation.data, 'time').time,
-        _.max(evaluation.data, 'time').time
-      ]);
-
-      scaleVolt.domain([
-        _.min(evaluation.data, 'volt').volt,
-        _.max(evaluation.data, 'volt').volt
-      ]);
-
-      scaleAmpere.domain([
-        _.min(evaluation.data, 'ampere').ampere,
-        _.max(evaluation.data, 'ampere').ampere
-      ]);
-
       svg.append('svg:path')
         .attr({
           d: lineVolt(evaluation.data),
@@ -119,7 +119,7 @@ angular.module('frontendApp')
       controller: function($log, $element, $scope) {
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
 
-        drawDiagram($element);
+        drawDiagram($element, $scope.evaluation);
         drawData($scope.evaluation);
 
         var jsonCircles = [];
