@@ -7,10 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.OptionalInt;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -60,24 +59,22 @@ public class EvaluationService {
                 .get()
                 .getAmpere();
 
-        final Double min = Math.pow(totalMinAmpere > 0 ? totalMaxAmpere : 0d, 1);
-        final Double max = Math.pow(totalMaxAmpere, 1);
+        LOG.info("min={}", totalMinAmpere);
+
+        final Double max = Math.pow(totalMaxAmpere - totalMinAmpere, 2); //min Wert auf 0 setzen
 
         List<Double> normedMeasurePointsTotal = evaluation.getData().stream()
                 .map(Coordinate::getAmpere)             //Strom
-                .map(value -> value > 0 ? value : 0)    //Negativer Strom auf 0 setzen
-//                .map(value -> value * value)            //Quadieren für die Genauigkeit
-                .map(val -> 100.0f * ((val - min) / (max - min))) //Normieren auf 100%
+                .map(value -> value - totalMinAmpere)   //min Wert auf 0 setzen
+                .map(value -> value * value)            //Quadieren für die Genauigkeit
+                .map(value -> 100.0f * ((value - 0) / (max - 0))) //Normieren auf 100%
                 .collect(Collectors.toList());
 
         OptionalInt firstIndex = IntStream.range(0, normedMeasurePointsTotal.size())
-                .filter(i -> normedMeasurePointsTotal.get(i) > 1)
+                //Erster Wert, der 0.05% Übersteigt. !!Achtung Quadrierung. Es ist nicht linear
+                .filter(i -> normedMeasurePointsTotal.get(i) > 0.05)
                 .findFirst();
 
         return evaluation.getData().get(firstIndex.getAsInt());
-    }
-
-    private Function<Coordinate, Double> normieren(Double max, Double min) {
-        return coordinate -> 100.0f * ((coordinate.getAmpere() - min) / (max - min));
     }
 }
