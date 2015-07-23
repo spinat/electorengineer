@@ -40,6 +40,8 @@ public class EvaluationController {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_SHOW, evaluationName);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
+        evaluationService.calc(evaluation);
+
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
