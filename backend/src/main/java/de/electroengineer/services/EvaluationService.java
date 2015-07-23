@@ -23,9 +23,6 @@ public class EvaluationService {
     public Evaluation getEvaluation(String evaluationName) throws IOException {
         String json = readFileAndDecompress(evaluationName);
         Evaluation evaluation = parseJsonToEvaluation(json);
-
-        generatePreviewData(evaluation);
-
         return evaluation;
     }
 
@@ -43,7 +40,7 @@ public class EvaluationService {
         return evaluations;
     }
     
-    private void generatePreviewData(Evaluation evaluation) {
+    public void generatePreviewData(Evaluation evaluation) {
         int countMeasurePoints = evaluation.getData().size();
         int skip = countMeasurePoints / 1000;
 
@@ -73,5 +70,7 @@ public class EvaluationService {
         return sb.toString();
     }
 
+    public void calc(Evaluation evaluation) {
 
+    }
 }

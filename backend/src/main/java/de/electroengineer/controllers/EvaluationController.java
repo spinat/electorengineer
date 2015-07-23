@@ -33,17 +33,22 @@ public class EvaluationController {
 
     @RequestMapping(API_EVALUATION_SHOW)
     public Evaluation showEvaluation(@PathVariable String evaluationName) throws IOException {
-
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_SHOW, evaluationName);
+
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
+        evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
     }
 
     @RequestMapping(API_EVALUATION_CALC)
-    public String calculate(@PathVariable String evaluationName) {
+    public Evaluation calculate(@PathVariable String evaluationName) throws IOException {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_CALC, evaluationName);
 
-        return "Calc";
+        Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
+        evaluationService.calc(evaluation);
+        evaluationService.generatePreviewData(evaluation);
+
+        return evaluation;
     }
 }
