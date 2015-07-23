@@ -69,7 +69,7 @@ public class EvaluationService {
                 .collect(Collectors.toList());
 
         OptionalInt firstIndex = IntStream.range(0, normedMeasurePointsTotal.size())
-                .filter(i -> normedMeasurePointsTotal.get(i) > 5)
+                .filter(i -> normedMeasurePointsTotal.get(i) > 20)
                 .findFirst();
 
         return evaluation.getData().get(firstIndex.getAsInt());

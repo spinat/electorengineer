@@ -122,6 +122,24 @@ angular.module('frontendApp')
         drawDiagram($element);
         drawData($scope.evaluation);
 
+        var jsonCircles = [];
+        jsonCircles.push($scope.evaluation.t1Start);
+
+        $log.info('Kreise:', jsonCircles);
+
+        var circles = svg.selectAll('circle')
+        .data(jsonCircles)
+        .enter()
+        .append('circle');
+
+        circles
+          .attr('cx', function (d) { return scaleTime(d.time); })
+          .attr('cy', function (d) { return scaleAmpere(d.ampere); })
+          .attr('r', function () { return 5; })
+          .style('fill', function() { return 'green'; })
+          .append('title')
+          .text(function() { return 'hi'; });
+
       },
 
       template: '<svg width="0" height="0"></svg>',
