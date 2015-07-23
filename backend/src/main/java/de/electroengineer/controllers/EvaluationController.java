@@ -17,10 +17,19 @@ public class EvaluationController {
 
     public static final String API_EVALUATION_SHOW = "/api/evaluation/{evaluationName}";
     public static final String API_EVALUATION_LIST = "/api/evaluation/list";
+    public static final String API_EVALUATION_CALC = "/api/evaluation/{evaluationName}/calc";
     private static Logger LOG = LoggerFactory.getLogger(EvaluationController.class);
 
     @Autowired
     EvaluationService evaluationService;
+
+    @RequestMapping(API_EVALUATION_LIST)
+    public List<String> listEvaluation() throws IOException {
+        LOG.info("Request to {}.", API_EVALUATION_LIST);
+
+        List<String> allEvaluations = evaluationService.findAllEvaluations();
+        return allEvaluations;
+    }
 
     @RequestMapping(API_EVALUATION_SHOW)
     public Evaluation showEvaluation(@PathVariable String evaluationName) throws IOException {
@@ -31,11 +40,10 @@ public class EvaluationController {
         return evaluation;
     }
 
-    @RequestMapping(API_EVALUATION_LIST)
-    public List<String> listEvaluation() throws IOException {
-        LOG.info("Request to {}.", API_EVALUATION_LIST);
+    @RequestMapping(API_EVALUATION_CALC)
+    public String calculate(@PathVariable String evaluationName) {
+        LOG.info("Request to {}. evaluationName={}", API_EVALUATION_CALC, evaluationName);
 
-        List<String> allEvaluations = evaluationService.findAllEvaluations();
-        return allEvaluations;
+        return "Calc";
     }
 }
