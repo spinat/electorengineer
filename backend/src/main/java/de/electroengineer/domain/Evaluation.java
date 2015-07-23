@@ -8,6 +8,16 @@ public class Evaluation {
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
 
+    private Coordinate t1Start;
+
+    public Coordinate getT1Start() {
+        return t1Start;
+    }
+
+    public void setT1Start(Coordinate t1Start) {
+        this.t1Start = t1Start;
+    }
+
     public List<Coordinate> getData() {
         return data;
     }

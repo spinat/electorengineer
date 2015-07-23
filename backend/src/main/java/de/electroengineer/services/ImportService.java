@@ -1,17 +1,14 @@
 package de.electroengineer.services;
 
-import com.google.gson.Gson;
 import de.electroengineer.domain.Coordinate;
 import de.electroengineer.domain.Evaluation;
 import de.electroengineer.domain.Measure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,16 +16,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import java.util.zip.GZIPOutputStream;
 
 @Service
 public class ImportService {
 
+    @Autowired
+    FileService fileService;
+
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
 
-    public static final String DATA_FOLDER = "data/";
     public static final String SPOOL = "spool";
-    public static final String COMPRESS_FILE_EXTENSION = ".gz";
+
     public static final int BEGIN_MEASURE_DATA = 17;
 
     public void startImport() throws IOException {
@@ -88,17 +86,7 @@ public class ImportService {
         List<Coordinate> coordinates = generateCoordinates(voltData, ampereData, evaluation.getMeasures().get(0).getSampleIntervall());
         evaluation.setData(coordinates);
 
-        Gson gson = new Gson();
-        String json = gson.toJson(evaluation);
-
-        String fileName = paths.get(0).getFileName().toString();
-        try(FileOutputStream output = new FileOutputStream(DATA_FOLDER + extractGroupName(fileName) + COMPRESS_FILE_EXTENSION)) {
-            Writer writer = new OutputStreamWriter(new GZIPOutputStream(output), "UTF-8");
-            writer.write(json);
-            writer.close();
-        } catch (IOException e) {
-            LOG.error(e.getMessage());
-        }
+        fileService.storeEvaluation(evaluation, extractGroupName(paths.get(0).getFileName().toString()));
 
         return;
     }

@@ -3,6 +3,9 @@ package de.electroengineer.services;
 import com.google.gson.Gson;
 import de.electroengineer.domain.Coordinate;
 import de.electroengineer.domain.Evaluation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -10,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPInputStream;
@@ -17,27 +22,17 @@ import java.util.zip.GZIPInputStream;
 @Service
 public class EvaluationService {
 
-    public static final String DATA_FOLDER = "data/";
-    public static final String COMPRESS_FILE_EXENTSION = ".gz";
+    private static final Logger LOG = LoggerFactory.getLogger(EvaluationService.class);
+
+    @Autowired
+    FileService fileService;
 
     public Evaluation getEvaluation(String evaluationName) throws IOException {
-        String json = readFileAndDecompress(evaluationName);
-        Evaluation evaluation = parseJsonToEvaluation(json);
-        return evaluation;
+        return fileService.loadEvaluation(evaluationName);
     }
 
     public List<String> findAllEvaluations() throws IOException {
-        List<String> evaluations = Files.walk(Paths.get(DATA_FOLDER))
-                .filter(path -> Files.isRegularFile(path))
-                .map(path -> path.getFileName().toString())
-                .map(filename -> filename.substring(0, filename.length() - 3))
-                .collect(Collectors.toList());
-
-        if(evaluations == null) {
-            evaluations = new ArrayList<>();
-        }
-
-        return evaluations;
+        return fileService.listAllEvaluations();
     }
     
     public void generatePreviewData(Evaluation evaluation) {
@@ -52,25 +47,40 @@ public class EvaluationService {
         evaluation.setData(coordinates);
     }
 
-    private Evaluation parseJsonToEvaluation(String json) {
-        return new Gson().fromJson(json, Evaluation.class);
-    }
-
-    private static String readFileAndDecompress(String evaluationName) throws IOException {
-        GZIPInputStream in = new GZIPInputStream(new FileInputStream(DATA_FOLDER + evaluationName + COMPRESS_FILE_EXENTSION));
-        Reader decoder = new InputStreamReader(in);
-        BufferedReader br = new BufferedReader(decoder);
-        StringBuilder sb = new StringBuilder();
-
-        String line;
-        while ((line = br.readLine()) != null) {
-            sb.append(line);
-        }
-
-        return sb.toString();
-    }
-
     public void calc(Evaluation evaluation) {
 
+        Double totalMaxAmpere = evaluation.getData().parallelStream()
+                .max((v1, v2) -> Double.compare(v1.getAmpere(), v2.getAmpere()))
+                .get()
+                .getAmpere();
+
+        Double totalMinAmpere = evaluation.getData().parallelStream()
+                .min((v1, v2) -> Double.compare(v1.getAmpere(), v2.getAmpere()))
+                .get()
+                .getAmpere();
+
+        final Double min = totalMinAmpere > 0 ? totalMaxAmpere : 0d;
+        LOG.info("total max={}, total min={} from ampere", totalMaxAmpere, totalMinAmpere);
+
+        List<Double> normierteMesspunkteTotal = evaluation.getData().stream()
+                .map(Coordinate::getAmpere)
+                .filter(val -> val > 0)
+                .map(val -> 100.0f * ((val - min) / (totalMaxAmpere - min)))
+                .collect(Collectors.toList());
+
+        OptionalInt firstIndex = IntStream.range(0, normierteMesspunkteTotal.size())
+                .filter(i -> normierteMesspunkteTotal.get(i) > 5)
+                .findFirst();
+
+        Coordinate coordinate = evaluation.getData().get(firstIndex.getAsInt());
+        evaluation.setT1Start(coordinate);
+
+        LOG.info("total max={}, total min={} from ampere", totalMaxAmpere, totalMinAmpere);
+
+
+    }
+
+    private Function<Coordinate, Double> normieren(Double max, Double min) {
+        return coordinate -> 100.0f * ((coordinate.getAmpere() - min) / (max - min));
     }
 }
