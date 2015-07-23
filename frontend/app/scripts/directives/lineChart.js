@@ -138,7 +138,12 @@ angular.module('frontendApp')
           .attr('r', function () { return 5; })
           .style('fill', function() { return 'green'; })
           .append('title')
-          .text(function() { return 'hi'; });
+          .text(function(d) {
+            return '' +
+              'x: ' + d.time + '\n' +
+              'v: ' + d.volt + '\n' +
+              'a: ' + d.ampere;
+          });
 
       },
 
