@@ -7,9 +7,18 @@ public class Evaluation {
 
     private String evaluationName;
     private Coordinate t1Start;
+    private List<Coordinate> test;
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
+
+    public List<Coordinate> getTest() {
+        return test;
+    }
+
+    public void setTest(List<Coordinate> test) {
+        this.test = test;
+    }
 
     public String getEvaluationName() {
         return evaluationName;

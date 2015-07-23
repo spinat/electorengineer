@@ -122,8 +122,12 @@ angular.module('frontendApp')
         drawDiagram($element, $scope.evaluation);
         drawData($scope.evaluation);
 
-        var jsonCircles = [];
+        var jsonCircles = $scope.evaluation.test;
         jsonCircles.push($scope.evaluation.t1Start);
+
+        //var spanne = JSON.parse(JSON.stringify($scope.evaluation.t1Start));
+        //spanne.time += 7500 * 1E-6;
+        //jsonCircles.push(spanne);
 
         $log.info('Kreise:', jsonCircles);
 

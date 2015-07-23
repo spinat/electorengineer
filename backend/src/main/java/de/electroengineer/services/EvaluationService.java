@@ -45,7 +45,15 @@ public class EvaluationService {
         Coordinate t1StartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.setT1Start(t1StartCoordinate);
 
+        List<Coordinate> coordinates = rmsAmpere(evaluation, t1StartCoordinate);
+        evaluation.setTest(coordinates);
+
         return evaluation;
+    }
+
+    private List<Coordinate> rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate) {
+        SlidingWindow slidingWindow = new SlidingWindow();
+        return slidingWindow.maximumTurningPoint(evaluation, t1StartCoordinate);
     }
 
     private Coordinate findT1StartCoordinate(Evaluation evaluation) {
