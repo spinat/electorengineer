@@ -124,7 +124,6 @@ angular.module('frontendApp')
 
 
         var calculationCoordinates = _.map($scope.evaluation.calculationCoordinates, function(coordinate){ return coordinate; });
-        calculationCoordinates.push($scope.evaluation.t1Start);
 
         //var spanne = JSON.parse(JSON.stringify($scope.evaluation.t1Start));
         //spanne.time += 10000 * 1E-6;

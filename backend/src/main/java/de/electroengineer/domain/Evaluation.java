@@ -8,12 +8,29 @@ import java.util.Map;
 public class Evaluation {
 
     private String evaluationName;
-    private Coordinate t1Start;
     private Double rmsAmpere;
+    private Double t1;
+    private Double t2;
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
+
+    public Double getT2() {
+        return t2;
+    }
+
+    public void setT2(Double t2) {
+        this.t2 = t2;
+    }
+
+    public Double getT1() {
+        return t1;
+    }
+
+    public void setT1(Double t1) {
+        this.t1 = t1;
+    }
 
     public Double getRmsAmpere() {
         return rmsAmpere;
@@ -41,14 +58,6 @@ public class Evaluation {
 
     public void setEvaluationName(String evaluationName) {
         this.evaluationName = evaluationName;
-    }
-
-    public Coordinate getT1Start() {
-        return t1Start;
-    }
-
-    public void setT1Start(Coordinate t1Start) {
-        this.t1Start = t1Start;
     }
 
     public List<Coordinate> getData() {

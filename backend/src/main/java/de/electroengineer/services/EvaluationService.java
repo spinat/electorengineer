@@ -44,14 +44,46 @@ public class EvaluationService {
     }
 
     public Evaluation calc(Evaluation evaluation, Double seconds) {
-        Coordinate t1StartCoordinate = findT1StartCoordinate(evaluation);
-        evaluation.setT1Start(t1StartCoordinate);
 
+        //tStart
+        Coordinate tStartCoordinate = findT1StartCoordinate(evaluation);
+        evaluation.addCalculationPoint("tStart", tStartCoordinate);
+
+        //RMS Ampere
         seconds = seconds == null ? 20d / 1000d : seconds;
-        Double rmsAmpere = rmsAmpere(evaluation, t1StartCoordinate, seconds);
+        Double rmsAmpere = rmsAmpere(evaluation, tStartCoordinate, seconds);
         evaluation.setRmsAmpere(rmsAmpere);
 
+        //T63
+        Coordinate t63Coordinate = findT63Coordinate(evaluation);
+        evaluation.addCalculationPoint("t63", t63Coordinate);
+
+        Coordinate tRMSCoordinate = findTRMSCoordinate(evaluation);
+        evaluation.addCalculationPoint("tRMS", tRMSCoordinate);
+
+        //T1
+        double t1 = t63Coordinate.getTime() - tStartCoordinate.getTime();
+        evaluation.setT1(t1);
+
+        double t2 = tRMSCoordinate.getTime() - tStartCoordinate.getTime();
+        evaluation.setT2(t2);
+
+
         return evaluation;
+    }
+
+    private Coordinate findTRMSCoordinate(Evaluation evaluation) {
+        return evaluation.getData().stream()
+                .filter(coordinate -> coordinate.getAmpere() >= evaluation.getRmsAmpere())
+                .findFirst()
+                .get();
+    }
+
+    private Coordinate findT63Coordinate(Evaluation evaluation) {
+        return evaluation.getData().stream()
+                .filter(coordinate -> coordinate.getAmpere() >= evaluation.getRmsAmpere() * 0.63)
+                .findFirst()
+                .get();
     }
 
 
@@ -72,14 +104,14 @@ public class EvaluationService {
         return startIndex.getAsInt();
     }
 
-    private Double rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate, double seconds) {
+    private Double rmsAmpere(Evaluation evaluation, Coordinate tStartCoordinate, double seconds) {
 
         List<Coordinate> evaluationData = evaluation.getData();
 
         //---------- Sliding Window - Find negative Slope -------------------
         int windowSize = 100;
         int slideStep = 10;
-        int startIndex = findIndex(evaluationData, t1StartCoordinate);
+        int startIndex = findIndex(evaluationData, tStartCoordinate);
 
         Integer firstAmplitudeIndex = null; //Result
 
