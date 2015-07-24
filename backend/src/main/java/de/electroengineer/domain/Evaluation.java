@@ -10,12 +10,30 @@ public class Evaluation {
     private String evaluationName;
     private Double rmsAmpere;
     private Double rmsVolt;
+    private Double r;
+    private Double l;
     private Double t1;
     private Double t2;
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
+
+    public Double getL() {
+        return l;
+    }
+
+    public void setL(Double l) {
+        this.l = l;
+    }
+
+    public Double getR() {
+        return r;
+    }
+
+    public void setR(Double r) {
+        this.r = r;
+    }
 
     public Double getRmsVolt() {
         return rmsVolt;

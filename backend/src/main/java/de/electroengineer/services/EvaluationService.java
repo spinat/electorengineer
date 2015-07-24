@@ -65,11 +65,20 @@ public class EvaluationService {
         double t1 = t63Coordinate.getTime() - tStartCoordinate.getTime();
         evaluation.setT1(t1);
 
+        //T2
         double t2 = tRMSCoordinate.getTime() - tStartCoordinate.getTime();
         evaluation.setT2(t2);
 
+        //RMS Volt
         double rmsVolt = rmsVolt(evaluation, seconds);
         evaluation.setRmsVolt(rmsVolt);
+
+        //R
+        double r = rmsVolt / rmsAmpere;
+        evaluation.setR(r);
+
+        //L
+        evaluation.setL(t1 * r);
 
         return evaluation;
     }
