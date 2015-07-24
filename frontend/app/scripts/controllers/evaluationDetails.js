@@ -6,4 +6,6 @@ angular.module('frontendApp')
 
     $scope.evaluation = Evaluation;
 
+    $scope.units = ['', 'm', 'µ'];
+
   });

@@ -45,12 +45,14 @@ public class EvaluationService {
 
     public Evaluation calc(Evaluation evaluation, Double seconds) {
 
+        //default 20ms
+        seconds = seconds == null ? 20d / 1000d : seconds;
+
         //tStart
         Coordinate tStartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.addCalculationPoint("tStart", tStartCoordinate);
 
         //RMS Ampere
-        seconds = seconds == null ? 20d / 1000d : seconds;
         Double rmsAmpere = rmsAmpere(evaluation, tStartCoordinate, seconds);
         evaluation.setRmsAmpere(rmsAmpere);
 

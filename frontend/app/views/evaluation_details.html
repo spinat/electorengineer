@@ -1,37 +1,37 @@
-<h1>Auswertung</h1>
+<h3>Auswertung: {{evaluation.evaluationName}}</h3>
 
 <table class="table">
   <tr>
     <td>Strom RMS</td>
-    <td>{{evaluation.rmsAmpere}}</td>
+    <td>{{evaluation.rmsAmpere | number:2}} A</td>
   </tr>
   <tr>
     <td>Spannung RMS</td>
-    <td>{{evaluation.rmsVolt}}</td>
+    <td>{{evaluation.rmsVolt | number:2}} V</td>
   </tr>
   <tr>
     <td>R</td>
-    <td>{{evaluation.r}}</td>
-  </tr>
-  <tr>
-    <td>L</td>
-    <td>{{evaluation.l}}</td>
-  </tr>
-  <tr>
-    <td>TStart</td>
-    <td>{{evaluation.calculationCoordinates.tStart.time}}</td>
-  </tr>
-  <tr>
-    <td>T63</td>
-    <td>{{evaluation.calculationCoordinates.t63.time}}</td>
+    <td>{{evaluation.r * 1e3 | number:2}} m&#8486;</td>
   </tr>
   <tr>
     <td>T1</td>
-    <td>{{evaluation.t1}}</td>
+    <td>{{evaluation.t1 * 1e6 | number:2}} µs</td>
   </tr>
   <tr>
-    <td>T2</td>
-    <td>{{evaluation.t2}}</td>
+    <td>L</td>
+    <td>{{evaluation.l * 1e6 | number:2}} µH</td>
+  </tr>
+  <!--<tr>-->
+    <!--<td>TStart</td>-->
+    <!--<td>{{evaluation.calculationCoordinates.tStart.time}}</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td>T63</td>-->
+    <!--<td>{{evaluation.calculationCoordinates.t63.time}}</td>-->
+  <!--</tr>-->
+  <!--<tr>-->
+    <!--<td>T2</td>-->
+    <!--<td>{{evaluation.t2}}</td>-->
   </tr>
 </table>
 
