@@ -68,8 +68,24 @@ public class EvaluationService {
         double t2 = tRMSCoordinate.getTime() - tStartCoordinate.getTime();
         evaluation.setT2(t2);
 
+        double rmsVolt = rmsVolt(evaluation);
+        evaluation.setRmsVolt(rmsVolt);
 
         return evaluation;
+    }
+
+    private double rmsVolt(Evaluation evaluation) {
+
+        List<Coordinate> data = evaluation.getData();
+
+        Coordinate coordinate = data.stream()
+                .limit(10000)
+                .findFirst()
+                .get();
+
+        evaluation.addCalculationPoint("test", coordinate);
+
+        return 1d;
     }
 
     private Coordinate findTRMSCoordinate(Evaluation evaluation) {

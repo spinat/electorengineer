@@ -9,12 +9,21 @@ public class Evaluation {
 
     private String evaluationName;
     private Double rmsAmpere;
+    private Double rmsVolt;
     private Double t1;
     private Double t2;
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
+
+    public Double getRmsVolt() {
+        return rmsVolt;
+    }
+
+    public void setRmsVolt(Double rmsVolt) {
+        this.rmsVolt = rmsVolt;
+    }
 
     public Double getT2() {
         return t2;
