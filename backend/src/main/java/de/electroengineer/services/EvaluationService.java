@@ -78,23 +78,33 @@ public class EvaluationService {
 
         List<Coordinate> data = evaluation.getData();
 
+        //---------------- Find left Amplitude ---------------------
         Coordinate leftAmplitude = data.stream()
                 .limit(10000)
                 .max((o1, o2) -> Double.compare(o1.getVolt(), o2.getVolt()))
                 .get();
         evaluation.addCalculationPoint("v_leftAmplitude", leftAmplitude);
 
+        //---------------- Find left Amplitude ---------------------
         int indexLeftAmplitude = findIndex(data, leftAmplitude);
-
         Coordinate rightAmplitude = data.stream()
                 .skip(indexLeftAmplitude)
                 .filter(coordinate -> coordinate.getTime() - leftAmplitude.getTime() >= seconds)
                 .findFirst()
                 .get();
-        evaluation.addCalculationPoint("v_rightAmplitutde", rightAmplitude);
+        evaluation.addCalculationPoint("v_rightAmplitude", rightAmplitude);
 
+        //---------------- Calc RMS ---------------------
+        int lowerInterval = findIndex(data, leftAmplitude);
+        int upperInterval = findIndex(data, rightAmplitude);
+        double periodOfTime = rightAmplitude.getTime() - leftAmplitude.getTime();
+        double sampleInterval = evaluation.getMeasures().get(0).getSampleIntervall();
 
-        return 1d;
+        double rms = IntStream.range(lowerInterval, upperInterval)
+                .mapToDouble(i -> data.get(i).getVolt() * sampleInterval / periodOfTime)
+                .sum();
+
+        return rms;
     }
 
     private Coordinate findTRMSCoordinate(Evaluation evaluation) {
