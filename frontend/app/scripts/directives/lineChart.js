@@ -123,7 +123,10 @@ angular.module('frontendApp')
         drawData($scope.evaluation);
 
 
-        var calculationCoordinates = _.map($scope.evaluation.calculationCoordinates, function(coordinate){ return coordinate; });
+        var calculationCoordinates = _.map($scope.evaluation.calculationCoordinates, function(coordinate, attributeName){
+          coordinate.name=attributeName;
+          return coordinate;
+        });
 
         //var spanne = JSON.parse(JSON.stringify($scope.evaluation.t1Start));
         //spanne.time += 10000 * 1E-6;
@@ -138,7 +141,11 @@ angular.module('frontendApp')
 
         circles
           .attr('cx', function (d) { return scaleTime(d.time); })
-          .attr('cy', function (d) { return scaleAmpere(d.ampere); })
+          .attr('cy', function (d) {
+            if(d.name.startsWith('v_')) {
+              return scaleVolt(d.volt);
+            }
+            return scaleAmpere(d.ampere); })
           .attr('r', function () { return 5; })
           .attr('opacity', 0.25)
           .style('fill', function() { return 'green'; })
