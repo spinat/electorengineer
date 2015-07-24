@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,8 +43,8 @@ public class EvaluationService {
 
     public Evaluation calc(Evaluation evaluation, Double seconds) {
 
-        //default 20ms
-        seconds = seconds == null ? 20d / 1000d : seconds;
+        //default 10ms
+        seconds = seconds == null ? 10d / 1000d : seconds;
 
         //tStart
         Coordinate tStartCoordinate = findT1StartCoordinate(evaluation);
@@ -205,6 +203,39 @@ public class EvaluationService {
     }
 
     private Coordinate findT1StartCoordinate(Evaluation evaluation) {
+
+//        List<Coordinate> evaluationData = evaluation.getData();
+//        Double sampleInterval = evaluation.getMeasures().get(0).getSampleIntervall();
+//
+//
+//        //---------- Sliding Window - Find T1 Coordinate -------------------
+//        int windowSize = 1000;
+//        int slideStep = 10;
+//        Integer stopValue = null;
+//
+//        System.out.println("Start");
+//        for(int currentStartWindow = 0; currentStartWindow < evaluationData.size() / 2; currentStartWindow += slideStep) {
+//            //Collect Data in Window
+//            int currentEndWindow = currentStartWindow + windowSize;
+//
+//            SimpleRegression regression = collectWindowData(evaluation, currentStartWindow, currentEndWindow);
+//
+//            double mean = IntStream.range(currentStartWindow, currentEndWindow)
+//                    .mapToDouble(i -> evaluationData.get(i).getAmpere())
+//                    .average()
+//                    .getAsDouble();
+//
+//            if(currentStartWindow == 0) {
+//                stopValue = (int) mean + 1;
+//            }
+//
+//            System.out.println(mean);
+//            if(mean >= stopValue) {
+//                evaluation.addCalculationPoint("t1_new", evaluationData.get(currentEndWindow));
+//                break;
+//            }
+//        }
+
         Double totalMaxAmpere = evaluation.getData().parallelStream()
                 .max((v1, v2) -> Double.compare(v1.getAmpere(), v2.getAmpere()))
                 .get()
@@ -224,11 +255,13 @@ public class EvaluationService {
                 .map(value -> 100.0f * ((value - 0) / (max - 0))) //Normieren auf 100%
                 .collect(Collectors.toList());
 
-        OptionalInt firstIndex = IntStream.range(0, normedMeasurePointsTotal.size())
+        int firstIndex = IntStream.range(0, normedMeasurePointsTotal.size())
                 //Erster Wert, der 0.05% Übersteigt. !!Achtung Quadrierung. Es ist nicht linear
                 .filter(i -> normedMeasurePointsTotal.get(i) > 0.05)
-                .findFirst();
+                .findFirst()
+                .getAsInt();
 
-        return evaluation.getData().get(firstIndex.getAsInt());
+        System.out.print(firstIndex);
+        return evaluation.getData().get(firstIndex-16);
     }
 }
