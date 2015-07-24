@@ -122,24 +122,25 @@ angular.module('frontendApp')
         drawDiagram($element, $scope.evaluation);
         drawData($scope.evaluation);
 
-        var jsonCircles = $scope.evaluation.test;
-        jsonCircles.push($scope.evaluation.t1Start);
+
+        var calculationCoordinates = _.map($scope.evaluation.calculationPoints, function(coordinate){ return coordinate; });
+        calculationCoordinates.push($scope.evaluation.t1Start);
 
         //var spanne = JSON.parse(JSON.stringify($scope.evaluation.t1Start));
         //spanne.time += 7500 * 1E-6;
         //jsonCircles.push(spanne);
 
-        $log.info('Kreise:', jsonCircles);
+        $log.info('Kreise:', calculationCoordinates);
 
         var circles = svg.selectAll('circle')
-        .data(jsonCircles)
+        .data(calculationCoordinates)
         .enter()
         .append('circle');
 
         circles
           .attr('cx', function (d) { return scaleTime(d.time); })
           .attr('cy', function (d) { return scaleAmpere(d.ampere); })
-          .attr('r', function () { return 5; })
+          .attr('r', function () { return 3; })
           .style('fill', function() { return 'green'; })
           .append('title')
           .text(function(d) {

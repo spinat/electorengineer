@@ -5,19 +5,21 @@ import de.electroengineer.domain.Evaluation;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+@Service
 public class SlidingWindow {
 
     private static final Logger LOG = LoggerFactory.getLogger(SlidingWindow.class);
 
     private static final int WINDOW_SIZE = 5;
 
-    public List<Coordinate> maximumTurningPoint(Evaluation evaluation, Coordinate t1StartCoordinate) {
+    public Map<String, Coordinate> maximumTurningPoint(Evaluation evaluation, Coordinate t1StartCoordinate) {
 
         //Find start location
         OptionalInt startIndex = IntStream.range(0, evaluation.getData().size())
@@ -25,13 +27,13 @@ public class SlidingWindow {
                 .findFirst();
 
         //Slide Window
-        List<Coordinate> coordinates = slideWindow(evaluation, startIndex.getAsInt());
+        Map<String, Coordinate> coordinates = slideWindow(evaluation, startIndex.getAsInt());
         return coordinates;
     }
 
-    private List<Coordinate> slideWindow(Evaluation evaluation, int startIndex) {
+    private Map<String, Coordinate> slideWindow(Evaluation evaluation, int startIndex) {
 
-        List<Coordinate> found = new ArrayList<>();
+        Map<String, Coordinate> found = new HashMap<>();
         int countNegativeSlopes = 0;
 
         int startMaxMinIndex = 0;
@@ -59,8 +61,8 @@ public class SlidingWindow {
         Optional<Coordinate> min = data.stream()
                 .min((o1, o2) -> Double.compare(o1.getAmpere(), o2.getAmpere()));
 
-        found.add(max.get());
-        found.add(min.get());
+        found.put("max", max.get());
+        found.put("min", min.get());
 
         return found;
     }

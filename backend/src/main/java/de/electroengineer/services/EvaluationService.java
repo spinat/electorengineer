@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -20,6 +21,9 @@ public class EvaluationService {
 
     @Autowired
     FileService fileService;
+
+    @Autowired
+    SlidingWindow slidingWindow;
 
     public Evaluation getEvaluation(String evaluationName) throws IOException {
         return fileService.loadEvaluation(evaluationName);
@@ -45,15 +49,28 @@ public class EvaluationService {
         Coordinate t1StartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.setT1Start(t1StartCoordinate);
 
-        List<Coordinate> coordinates = rmsAmpere(evaluation, t1StartCoordinate);
-        evaluation.setTest(coordinates);
+        rmsAmpere(evaluation, t1StartCoordinate);
+//        evaluation.setCalculationPoints(coordinates);
 
         return evaluation;
     }
 
-    private List<Coordinate> rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate) {
-        SlidingWindow slidingWindow = new SlidingWindow();
-        return slidingWindow.maximumTurningPoint(evaluation, t1StartCoordinate);
+    private void rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate) {
+
+        Map<String, Coordinate> coordinates = slidingWindow.maximumTurningPoint(evaluation, t1StartCoordinate);
+
+        Coordinate max = coordinates.get("max");
+        Coordinate min = coordinates.get("min");
+
+        evaluation.addCalculationPoint("maxAmpere", max);
+        evaluation.addCalculationPoint("minAmpere", min);
+
+        double gleichanteil = (min.getAmpere() + max.getAmpere()) / 2;
+        double amplitude = max.getAmpere() - gleichanteil;
+        double wechselEffektivWert = amplitude / Math.sqrt(2);
+        double rms = Math.sqrt(Math.pow(gleichanteil, 2) + Math.pow(wechselEffektivWert, 2));
+
+        LOG.info("Ampere RMS={}", rms);
     }
 
     private Coordinate findT1StartCoordinate(Evaluation evaluation) {
