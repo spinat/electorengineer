@@ -40,7 +40,7 @@ public class EvaluationController {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_SHOW, evaluationName);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
-        evaluationService.calc(evaluation);
+        evaluationService.calc(evaluation, null);
 
         evaluationService.generatePreviewData(evaluation);
 
@@ -52,7 +52,7 @@ public class EvaluationController {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_CALC, evaluationName);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
-        evaluationService.calc(evaluation);
+        evaluationService.calc(evaluation, null);
 
         fileService.storeEvaluation(evaluation);
         evaluationService.generatePreviewData(evaluation);

@@ -9,21 +9,30 @@ public class Evaluation {
 
     private String evaluationName;
     private Coordinate t1Start;
+    private Double rmsAmpere;
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
 
+    public Double getRmsAmpere() {
+        return rmsAmpere;
+    }
+
+    public void setRmsAmpere(Double rmsAmpere) {
+        this.rmsAmpere = rmsAmpere;
+    }
+
     public void addCalculationPoint(String name, Coordinate coordinate) {
         calculationCoordinates.put(name, coordinate);
     }
 
-    public Map<String, Coordinate> getCalculationPoints() {
+    public Map<String, Coordinate> getCalculationCoordinates() {
         return calculationCoordinates;
     }
 
-    public void setCalculationPoints(Map<String, Coordinate> calculationPoints) {
-        this.calculationCoordinates = calculationPoints;
+    public void setCalculationCoordinates(Map<String, Coordinate> calculationCoordinates) {
+        this.calculationCoordinates = calculationCoordinates;
     }
 
     public String getEvaluationName() {

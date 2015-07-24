@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
@@ -23,9 +22,6 @@ public class EvaluationService {
 
     @Autowired
     FileService fileService;
-
-    @Autowired
-    SlidingWindow slidingWindow;
 
     public Evaluation getEvaluation(String evaluationName) throws IOException {
         return fileService.loadEvaluation(evaluationName);
@@ -47,12 +43,13 @@ public class EvaluationService {
         evaluation.setData(coordinates);
     }
 
-    public Evaluation calc(Evaluation evaluation) {
+    public Evaluation calc(Evaluation evaluation, Double seconds) {
         Coordinate t1StartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.setT1Start(t1StartCoordinate);
 
-        rmsAmpere(evaluation, t1StartCoordinate);
-//        evaluation.setCalculationPoints(coordinates);
+        seconds = seconds == null ? 20d / 1000d : seconds;
+        Double rmsAmpere = rmsAmpere(evaluation, t1StartCoordinate, seconds);
+        evaluation.setRmsAmpere(rmsAmpere);
 
         return evaluation;
     }
@@ -67,90 +64,66 @@ public class EvaluationService {
         return regression;
     }
 
-    private void rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate) {
-
-        List<Coordinate> evaluationData = evaluation.getData();
+    private static int findIndex(List<Coordinate> evaluationData, Coordinate coordinate) {
         OptionalInt startIndex = IntStream.range(0, evaluationData.size())
-                .filter(i -> evaluationData.get(i).getTime() > t1StartCoordinate.getTime())
+                .filter(i -> evaluationData.get(i) == coordinate)
                 .findFirst();
 
+        return startIndex.getAsInt();
+    }
 
-        int WINDOW_SIZE = 100;
-        int size = 10000;
-        double sampleIntervall = evaluation.getMeasures().get(0).getSampleIntervall();
-        int gipfelIndex = 0;
-        //Finde Gipfel
-        for(int currentStartWindow = startIndex.getAsInt(); currentStartWindow < evaluationData.size() / 2; currentStartWindow += 10) {
+    private Double rmsAmpere(Evaluation evaluation, Coordinate t1StartCoordinate, double seconds) {
+
+        List<Coordinate> evaluationData = evaluation.getData();
+
+        //---------- Sliding Window - Find negative Slope -------------------
+        int windowSize = 100;
+        int slideStep = 10;
+        int startIndex = findIndex(evaluationData, t1StartCoordinate);
+
+        Integer firstAmplitudeIndex = null; //Result
+
+        for(int currentStartWindow = startIndex; currentStartWindow < evaluationData.size() / 2; currentStartWindow += slideStep) {
             //Collect Data in Window
-            int currentEndWindow = currentStartWindow + WINDOW_SIZE;
+            int currentEndWindow = currentStartWindow + windowSize;
             SimpleRegression regression = collectWindowData(evaluation, currentStartWindow, currentEndWindow);
 
-            double slope = regression.getSlope() / sampleIntervall;
-//            System.out.println(slope);
-            if(slope < 0) {
-//                evaluation.addCalculationPoint("gipfel", evaluationData.get(currentEndWindow));
-                gipfelIndex = currentEndWindow;
+            //Evaluate Data
+            boolean isSlopNegative = regression.getSlope() < 0;
+            if(isSlopNegative) {
+                firstAmplitudeIndex = currentEndWindow;
                 break;
             }
         }
 
-        //Zwischen Gipfel und 10.000 Messpunkte max finden
-        int endExclusive = gipfelIndex + 10000;
-        List<Coordinate> leftWindow = IntStream.range(gipfelIndex, endExclusive)
-                .mapToObj(i -> evaluationData.get(i))
-                .collect(Collectors.toList());
-        Optional<Coordinate> max = leftWindow.stream().max((o1, o2) -> Double.compare(o1.getAmpere(), o2.getAmpere()));
+        //---------- Finde erste Amplitudenspitze -------------------
+        int skipAmplitudeInMeasurePoints = 10000;
+        int lastAmplitudeIndex = firstAmplitudeIndex + skipAmplitudeInMeasurePoints;
+        Coordinate leftAmplitudeCoordinate = IntStream.range(firstAmplitudeIndex, lastAmplitudeIndex)
+                .mapToObj(evaluationData::get)
+                .max((o1, o2) -> Double.compare(o1.getAmpere(), o2.getAmpere()))
+                .get();
+        evaluation.addCalculationPoint("leftAmplitude", leftAmplitudeCoordinate);
 
-        evaluation.addCalculationPoint("linksMax", max.get());
-
-        //Min
-        List<Coordinate> collect = IntStream.range(endExclusive + 15000, endExclusive + 25000)
-                .mapToObj(i -> evaluationData.get(i))
-                .collect(Collectors.toList());
-        Optional<Coordinate> min = collect.stream().min((o1, o2) -> Double.compare(o1.getAmpere(), o2.getAmpere()));
-//        evaluation.addCalculationPoint("linksmin", min.get());
-
-        Optional<Coordinate> _20ms = evaluationData.stream()
-                .filter(coordinate -> coordinate.getTime() - max.get().getTime() >= 0.01)
-                .findFirst();
-
-        evaluation.addCalculationPoint("20ms", _20ms.get());
-
-        //RMS Bestimmung
-
-        OptionalInt first = IntStream.range(0, evaluationData.size())
-                .filter(i -> evaluationData.get(i) == max.get())
-                .findFirst();
-
-        OptionalInt last = IntStream.range(0, evaluationData.size())
-                .filter(i -> evaluationData.get(i) == min.get())
-                .findFirst();
-
-        double periodenDauer = min.get().getTime() - max.get().getTime();
-        double rms = 0d;
-
-        for(int x = first.getAsInt(); x < last.getAsInt(); x++) {
-            double i = evaluation.getData().get(x).getAmpere();
-            rms += i*sampleIntervall / periodenDauer;
-        }
+        //---------- Finde nächste Amplitudenspitze ------
+        Coordinate rightAmplitudeCoordinate = evaluationData.stream()
+                .filter(coordinate -> coordinate.getTime() - leftAmplitudeCoordinate.getTime() >= seconds)
+                .findFirst()
+                .get();
+        evaluation.addCalculationPoint("rightAmplitude", rightAmplitudeCoordinate);
 
 
+        //---------- RMS bestimmen (Integral zwischen beiden Punten) -------------------
+        int lowerInterval = findIndex(evaluationData, leftAmplitudeCoordinate);
+        int upperInterval = findIndex(evaluationData, rightAmplitudeCoordinate);
+        double periodOfTime = rightAmplitudeCoordinate.getTime() - leftAmplitudeCoordinate.getTime();
+        double sampleInterval = evaluation.getMeasures().get(0).getSampleIntervall();
 
-        LOG.info("Ampere RMS={}", rms);
+        double rms = IntStream.range(lowerInterval, upperInterval)
+                .mapToDouble(i -> evaluationData.get(i).getAmpere() * sampleInterval / periodOfTime)
+                .sum();
 
-//        Map<String, Coordinate> coordinates = slidingWindow.maximumTurningPoint(evaluation, t1StartCoordinate);
-
-//        Coordinate max = coordinates.get("max");
-//        Coordinate min = coordinates.get("min");
-
-//        evaluation.addCalculationPoint("maxAmpere", max);
-//        evaluation.addCalculationPoint("minAmpere", min);
-
-//        double gleichanteil = (min.getAmpere() + max.getAmpere()) / 2;
-//        double amplitude = max.getAmpere() - gleichanteil;
-//        double wechselEffektivWert = amplitude / Math.sqrt(2);
-//        double rms = Math.sqrt(Math.pow(gleichanteil, 2) + Math.pow(wechselEffektivWert, 2));
-
+        return rms;
     }
 
     private Coordinate findT1StartCoordinate(Evaluation evaluation) {
@@ -163,8 +136,6 @@ public class EvaluationService {
                 .min((v1, v2) -> Double.compare(v1.getAmpere(), v2.getAmpere()))
                 .get()
                 .getAmpere();
-
-        LOG.info("min={}", totalMinAmpere);
 
         final Double max = Math.pow(totalMaxAmpere - totalMinAmpere, 2); //min Wert auf 0 setzen
 

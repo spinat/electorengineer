@@ -123,12 +123,12 @@ angular.module('frontendApp')
         drawData($scope.evaluation);
 
 
-        var calculationCoordinates = _.map($scope.evaluation.calculationPoints, function(coordinate){ return coordinate; });
+        var calculationCoordinates = _.map($scope.evaluation.calculationCoordinates, function(coordinate){ return coordinate; });
         calculationCoordinates.push($scope.evaluation.t1Start);
 
         //var spanne = JSON.parse(JSON.stringify($scope.evaluation.t1Start));
-        //spanne.time += 7500 * 1E-6;
-        //jsonCircles.push(spanne);
+        //spanne.time += 10000 * 1E-6;
+        //calculationCoordinates.push(spanne);
 
         $log.info('Kreise:', calculationCoordinates);
 
@@ -140,7 +140,8 @@ angular.module('frontendApp')
         circles
           .attr('cx', function (d) { return scaleTime(d.time); })
           .attr('cy', function (d) { return scaleAmpere(d.ampere); })
-          .attr('r', function () { return 3; })
+          .attr('r', function () { return 5; })
+          .attr('opacity', 0.25)
           .style('fill', function() { return 'green'; })
           .append('title')
           .text(function(d) {
