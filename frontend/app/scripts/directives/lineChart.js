@@ -163,6 +163,7 @@ angular.module('frontendApp')
           .append('title')
           .text(function(d) {
             return '' +
+              'name: ' + d.name + '\n' +
               'x: ' + d.time + '\n' +
               'v: ' + d.volt + '\n' +
               'a: ' + d.ampere;
