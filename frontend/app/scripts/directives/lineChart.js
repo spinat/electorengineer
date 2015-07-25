@@ -98,8 +98,8 @@ angular.module('frontendApp')
         .attr({
           d: lineVolt(evaluation.data),
           'stroke': 'blue',
-          'stroke-width': 1.5,
-          'opacity': 0.9,
+          'stroke-width': 1.0,
+          'opacity': 0.8,
           'fill': 'none',
           'class': 'path'
         });
@@ -108,8 +108,8 @@ angular.module('frontendApp')
         .attr({
           d: lineAmpere(evaluation.data),
           'stroke': 'red',
-          'stroke-width': 1.5,
-          'opacity': 0.9,
+          'stroke-width': 1.0,
+          'opacity': 0.8,
           'fill': 'none',
           'class': 'path'
         });
@@ -118,6 +118,16 @@ angular.module('frontendApp')
 
       controller: function($log, $element, $scope) {
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
+
+        $scope.toggleCoordinatesPoints = function(hideCoordinatesPoints) {
+          var circles = svg.selectAll('.circle');
+          if(hideCoordinatesPoints) {
+            circles.style('visibility', 'hidden');
+          } else {
+            circles.style('visibility', 'visible');
+          }
+        };
+
 
         drawDiagram($element, $scope.evaluation);
         drawData($scope.evaluation);
@@ -140,6 +150,7 @@ angular.module('frontendApp')
         .append('circle');
 
         circles
+          .attr('class', 'circle')
           .attr('cx', function (d) { return scaleTime(d.time); })
           .attr('cy', function (d) {
             if(d.name.startsWith('v_')) {
@@ -159,7 +170,7 @@ angular.module('frontendApp')
 
       },
 
-      template: '<svg width="0" height="0"></svg>',
+      templateUrl: 'scripts/directives/lineChart.html',
 
       scope: {
         evaluation: '='
