@@ -15,27 +15,27 @@ public class Evaluation {
     private Double t1;
     private Double t2;
 
-    private Double rmsVoltPeriod_ms;
-    private Double rmsAmperePeriod_ms;
+    private Double rmsVoltPeriodMs;
+    private Double rmsAmperePeriodMs;
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
 
-    public Double getRmsVoltPeriod_ms() {
-        return rmsVoltPeriod_ms;
+    public Double getRmsVoltPeriodMs() {
+        return rmsVoltPeriodMs;
     }
 
-    public void setRmsVoltPeriod_ms(Double rmsVoltPeriod_ms) {
-        this.rmsVoltPeriod_ms = rmsVoltPeriod_ms;
+    public void setRmsVoltPeriodMs(Double rmsVoltPeriodMs) {
+        this.rmsVoltPeriodMs = rmsVoltPeriodMs;
     }
 
-    public Double getRmsAmperePeriod_ms() {
-        return rmsAmperePeriod_ms;
+    public Double getRmsAmperePeriodMs() {
+        return rmsAmperePeriodMs;
     }
 
-    public void setRmsAmperePeriod_ms(Double rmsAmperePeriod_ms) {
-        this.rmsAmperePeriod_ms = rmsAmperePeriod_ms;
+    public void setRmsAmperePeriodMs(Double rmsAmperePeriodMs) {
+        this.rmsAmperePeriodMs = rmsAmperePeriodMs;
     }
 
     public Double getL() {

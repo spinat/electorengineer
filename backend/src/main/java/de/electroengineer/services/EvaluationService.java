@@ -48,7 +48,7 @@ public class EvaluationService {
         evaluation.addCalculationPoint("tStart", tStartCoordinate);
 
         //RMS Ampere
-        double rmsAmperePeriod = evaluation.getRmsAmperePeriod_ms() == null ? 10d / 1000d : evaluation.getRmsAmperePeriod_ms() / 1000d;
+        double rmsAmperePeriod = evaluation.getRmsAmperePeriodMs() == null ? 10d / 1000d : evaluation.getRmsAmperePeriodMs() / 1000d;
         Double rmsAmpere = rmsAmpere(evaluation, tStartCoordinate, rmsAmperePeriod);
         evaluation.setRmsAmpere(rmsAmpere);
 
@@ -68,7 +68,7 @@ public class EvaluationService {
         evaluation.setT2(t2);
 
         //RMS Volt
-        double rmsVoltPeriod = evaluation.getRmsVoltPeriod_ms() == null ? 10d / 1000d : evaluation.getRmsVoltPeriod_ms() / 1000d;
+        double rmsVoltPeriod = evaluation.getRmsVoltPeriodMs() == null ? 10d / 1000d : evaluation.getRmsVoltPeriodMs() / 1000d;
         double rmsVolt = rmsVolt(evaluation, rmsVoltPeriod);
         evaluation.setRmsVolt(rmsVolt);
 

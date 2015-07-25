@@ -34,5 +34,19 @@ angular.module('frontendApp')
       return deferred.promise;
     };
 
+    evaluationService.calc = function(evaluationName, rmsAmperePeriodMs, rmsVoltPeriodMs) {
+      var deferred = $q.defer();
+
+      $http.post('http://localhost:8080/api/evaluation/' + evaluationName + '/calc/' + rmsAmperePeriodMs + '/' + rmsVoltPeriodMs)
+        .success(function(response) {
+          deferred.resolve(response);
+        })
+        .error(function(response) {
+          deferred.reject(response);
+        });
+
+      return deferred.promise;
+    };
+
     return evaluationService;
   });

@@ -43,18 +43,18 @@
       <div class="form-group">
         <label class="col-sm-6 control-label">Spannungsabstand (ms)</label>
         <div class="col-sm-6 control-label">
-          <input class="form-control" type="number" ng-model="evaluation.rmsVoltPeriod_ms" />
+          <input class="form-control" type="number" ng-model="evaluation.rmsVoltPeriodMs" />
         </div>
       </div>
       <div class="form-group">
         <label class="col-sm-6 control-label">Stromabstand (ms)</label>
         <div class="col-sm-6 control-label">
-          <input class="form-control" type="number" ng-model="evaluation.rmsAmperePeriod_ms" />
+          <input class="form-control" type="number" ng-model="evaluation.rmsAmperePeriodMs" />
         </div>
       </div>
       <div class="form-group">
         <div class="col-sm-offset-6 col-sm-6">
-          <button type="submit" class="btn btn-default">Berechne</button>
+          <button class="btn btn-default" type="submit" ng-disable="inProgress">Berechne</button>
         </div>
       </div>
     </form>

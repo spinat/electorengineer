@@ -6,10 +6,7 @@ import de.electroengineer.services.FileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,7 +16,7 @@ public class EvaluationController {
 
     public static final String API_EVALUATION_SHOW = "/api/evaluation/{evaluationName}";
     public static final String API_EVALUATION_LIST = "/api/evaluation/list";
-    public static final String API_EVALUATION_CALC = "/api/evaluation/{evaluationName}/calc";
+    public static final String API_EVALUATION_CALC = "/api/evaluation/{evaluationName}/calc/{rmsAmperePeriodMs}/{rmsVoltPeriodMs}";
     private static Logger LOG = LoggerFactory.getLogger(EvaluationController.class);
 
     @Autowired
@@ -42,18 +39,22 @@ public class EvaluationController {
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
 
-        evaluationService.calc(evaluation);
-
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
     }
 
     @RequestMapping(value = API_EVALUATION_CALC, method = RequestMethod.POST)
-    public Evaluation calculate(@PathVariable String evaluationName) throws IOException {
-        LOG.info("Request to {}. evaluationName={}", API_EVALUATION_CALC, evaluationName);
+    public Evaluation calculate(@PathVariable("evaluationName") String evaluationName,
+                                @PathVariable("rmsAmperePeriodMs") Double rmsAmperePeriodMs,
+                                @PathVariable("rmsVoltPeriodMs") Double rmsVoltPeriodMs) throws IOException {
+
+        LOG.info("Request to {}. evaluationName={}, rmsAmperePeriodMs={}, rmsVoltPeriodMs={}", API_EVALUATION_CALC, evaluationName, rmsAmperePeriodMs, rmsVoltPeriodMs);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
+
+        evaluation.setRmsAmperePeriodMs(rmsAmperePeriodMs);
+        evaluation.setRmsVoltPeriodMs(rmsVoltPeriodMs);
 
         evaluationService.calc(evaluation);
         fileService.storeEvaluation(evaluation);
