@@ -41,17 +41,15 @@ public class EvaluationService {
         evaluation.setData(coordinates);
     }
 
-    public Evaluation calc(Evaluation evaluation, Double seconds) {
-
-        //default 10ms
-        seconds = seconds == null ? 10d / 1000d : seconds;
+    public Evaluation calc(Evaluation evaluation) {
 
         //tStart
         Coordinate tStartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.addCalculationPoint("tStart", tStartCoordinate);
 
         //RMS Ampere
-        Double rmsAmpere = rmsAmpere(evaluation, tStartCoordinate, seconds);
+        double rmsAmperePeriod = evaluation.getRmsAmperePeriod_ms() == null ? 10d / 1000d : evaluation.getRmsAmperePeriod_ms() / 1000d;
+        Double rmsAmpere = rmsAmpere(evaluation, tStartCoordinate, rmsAmperePeriod);
         evaluation.setRmsAmpere(rmsAmpere);
 
         //T63
@@ -70,7 +68,8 @@ public class EvaluationService {
         evaluation.setT2(t2);
 
         //RMS Volt
-        double rmsVolt = rmsVolt(evaluation, seconds);
+        double rmsVoltPeriod = evaluation.getRmsVoltPeriod_ms() == null ? 10d / 1000d : evaluation.getRmsVoltPeriod_ms() / 1000d;
+        double rmsVolt = rmsVolt(evaluation, rmsVoltPeriod);
         evaluation.setRmsVolt(rmsVolt);
 
         //R

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -40,21 +41,23 @@ public class EvaluationController {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_SHOW, evaluationName);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
-        evaluationService.calc(evaluation, null);
+
+        evaluationService.calc(evaluation);
 
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
     }
 
-    @RequestMapping(API_EVALUATION_CALC)
+    @RequestMapping(value = API_EVALUATION_CALC, method = RequestMethod.POST)
     public Evaluation calculate(@PathVariable String evaluationName) throws IOException {
         LOG.info("Request to {}. evaluationName={}", API_EVALUATION_CALC, evaluationName);
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
-        evaluationService.calc(evaluation, null);
 
+        evaluationService.calc(evaluation);
         fileService.storeEvaluation(evaluation);
+
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;

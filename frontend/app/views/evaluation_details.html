@@ -1,39 +1,65 @@
 <h3>Auswertung: {{evaluation.evaluationName}}</h3>
 
-<table class="table">
-  <tr>
-    <td>Spannung RMS</td>
-    <td>{{evaluation.rmsVolt | number:2}} V</td>
-  </tr>
-  <tr>
-    <td>Strom RMS</td>
-    <td>{{evaluation.rmsAmpere | number:2}} A</td>
-  </tr>
-  <tr>
-    <td>R</td>
-    <td>{{evaluation.r * 1e3 | number:2}} m&#8486;</td>
-  </tr>
-  <tr>
-    <td>T1</td>
-    <td>{{evaluation.t1 * 1e6 | number:2}} µs</td>
-  </tr>
-  <tr>
-    <td>L</td>
-    <td>{{evaluation.l * 1e6 | number:2}} µH</td>
-  </tr>
-  <!--<tr>-->
-    <!--<td>TStart</td>-->
-    <!--<td>{{evaluation.calculationCoordinates.tStart.time}}</td>-->
-  <!--</tr>-->
-  <!--<tr>-->
-    <!--<td>T63</td>-->
-    <!--<td>{{evaluation.calculationCoordinates.t63.time}}</td>-->
-  <!--</tr>-->
-  <!--<tr>-->
-    <!--<td>T2</td>-->
-    <!--<td>{{evaluation.t2}}</td>-->
-  </tr>
-</table>
+<div class="row">
+  <div class="col-xs-6">
+    <table class="table">
+      <tr>
+        <td>Spannung RMS</td>
+        <td>{{evaluation.rmsVolt | number:2}} V</td>
+      </tr>
+      <tr>
+        <td>Strom RMS</td>
+        <td>{{evaluation.rmsAmpere | number:2}} A</td>
+      </tr>
+      <tr>
+        <td>R</td>
+        <td>{{evaluation.r * 1e3 | number:2}} m&#8486;</td>
+      </tr>
+      <tr>
+        <td>T1</td>
+        <td>{{evaluation.t1 * 1e6 | number:2}} µs</td>
+      </tr>
+      <tr>
+        <td>L</td>
+        <td>{{evaluation.l * 1e6 | number:2}} µH</td>
+      </tr>
+      <!--<tr>-->
+        <!--<td>TStart</td>-->
+        <!--<td>{{evaluation.calculationCoordinates.tStart.time}}</td>-->
+      <!--</tr>-->
+      <!--<tr>-->
+        <!--<td>T63</td>-->
+        <!--<td>{{evaluation.calculationCoordinates.t63.time}}</td>-->
+      <!--</tr>-->
+      <!--<tr>-->
+        <!--<td>T2</td>-->
+        <!--<td>{{evaluation.t2}}</td>-->
+      </tr>
+    </table>
+
+  </div>
+  <div class="col-xs-6">
+    <form class="form-horizontal" novalidate ng-submit="calculate()" method="post">
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Spannungsabstand (ms)</label>
+        <div class="col-sm-6 control-label">
+          <input class="form-control" type="number" ng-model="evaluation.rmsVoltPeriod_ms" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-6 control-label">Stromabstand (ms)</label>
+        <div class="col-sm-6 control-label">
+          <input class="form-control" type="number" ng-model="evaluation.rmsAmperePeriod_ms" />
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-offset-6 col-sm-6">
+          <button type="submit" class="btn btn-default">Berechne</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 
 <hr/>
 
