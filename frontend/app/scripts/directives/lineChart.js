@@ -139,7 +139,7 @@ angular.module('frontendApp')
             ctx.drawImage( img, 0, 0 );
 
             var a = document.createElement('a');
-            a.download = 'image.png';
+            a.download = $scope.evaluation.evaluationName + '.png';
             a.href = canvas.toDataURL('image/png');
             document.body.appendChild(a);
             a.click();
