@@ -116,8 +116,36 @@ angular.module('frontendApp')
     }
     return {
 
-      controller: function($log, $element, $scope) {
+      controller: function($scope, $log, $element) {
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
+
+        $scope.download = function() {
+          $log.info('Download..');
+
+          var svg = document.querySelector( 'svg' );
+          var svgData = new XMLSerializer().serializeToString( svg );
+
+          var canvas = document.createElement( 'canvas' );
+          canvas.width = width + margin.left + margin.right;
+          canvas.height = height + margin.top + margin.bottom;
+
+          var ctx = canvas.getContext( '2d' );
+
+          var img = document.createElement( 'img' );
+          img.setAttribute( 'src', 'data:image/svg+xml;base64,' + btoa( svgData ) );
+
+          img.onload = function() {
+
+            ctx.drawImage( img, 0, 0 );
+
+            var a = document.createElement('a');
+            a.download = 'image.png';
+            a.href = canvas.toDataURL('image/png');
+            document.body.appendChild(a);
+            a.click();
+
+          };
+        };
 
         $scope.toggleCoordinatesPoints = function(hideCoordinatesPoints) {
           var circles = svg.selectAll('.circle');
