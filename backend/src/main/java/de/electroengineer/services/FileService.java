@@ -43,7 +43,7 @@ public class FileService {
         return parseJsonToEvaluation(json);
     }
 
-    public void storeEvaluation(Evaluation evaluation) {
+    public boolean storeEvaluation(Evaluation evaluation) {
         Gson gson = new Gson();
         String json = gson.toJson(evaluation);
 
@@ -53,7 +53,10 @@ public class FileService {
             writer.close();
         } catch (IOException e) {
             LOG.error(e.getMessage());
+            return false;
         }
+
+        return true;
     }
 
     private String readFileAndDecompress(String evaluationName) throws IOException {

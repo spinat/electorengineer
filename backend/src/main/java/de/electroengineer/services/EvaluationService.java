@@ -260,7 +260,6 @@ public class EvaluationService {
                 .findFirst()
                 .getAsInt();
 
-        System.out.print(firstIndex);
         return evaluation.getData().get(firstIndex-16);
     }
 }

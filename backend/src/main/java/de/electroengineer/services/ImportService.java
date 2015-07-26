@@ -22,11 +22,12 @@ public class ImportService {
 
     @Autowired
     FileService fileService;
+    @Autowired
+    EvaluationService evaluationService;
 
     private static final Logger LOG = LoggerFactory.getLogger(ImportService.class);
 
     public static final String SPOOL = "spool";
-
     public static final int BEGIN_MEASURE_DATA = 17;
 
     public void startImport() throws IOException {
@@ -48,14 +49,22 @@ public class ImportService {
 
         //Import Group
         for(String key : evaluations.keySet()) {
-            createEvaluations(evaluations.get(key));
+            Evaluation evaluation = createEvaluation(evaluations.get(key));
+            if(evaluation == null) {
+                continue;
+            }
+            fileService.storeEvaluation(evaluation);
+
+            evaluationService.calc(evaluation);
+            fileService.storeEvaluation(evaluation);
+
         }
     }
 
-    private void createEvaluations(List<Path> paths) {
-        if(paths.size() < 2) {
-            LOG.info("Die Auswertung hat nicht genügend Messungen. paths.size={}", paths.size());
-            return;
+    private Evaluation createEvaluation(List<Path> paths) {
+        if(paths.size() != 2) {
+            LOG.info("Für die Erstellung einer Auswertung müssen zwei Messungen existieren. Anzahl Auswertungen = ", paths.size());
+            return null;
         }
 
         //Collect Data
@@ -83,15 +92,17 @@ public class ImportService {
                     evaluation.getMeasures().add(measure);
                 });
 
+        if(voltData.size() == 0 || ampereData.size() == 0) {
+            LOG.error("Es gibt keine Strom- oder Spannungswerte");
+            return null;
+        }
+
+
         List<Coordinate> coordinates = generateCoordinates(voltData, ampereData, evaluation.getMeasures().get(0).getSampleIntervall());
         evaluation.setData(coordinates);
         evaluation.setEvaluationName(extractGroupName(paths.get(0).getFileName().toString()));
-        evaluation.setRmsAmperePeriodMs(10d);
-        evaluation.setRmsVoltPeriodMs(10d);
 
-        fileService.storeEvaluation(evaluation);
-
-        return;
+        return evaluation;
     }
 
     private List<Coordinate> generateCoordinates(List<Double> voltData, List<Double> ampereData, Double sampleIntervall) {

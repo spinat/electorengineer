@@ -15,8 +15,8 @@ public class Evaluation {
     private Double t1;
     private Double t2;
 
-    private Double rmsVoltPeriodMs;
-    private Double rmsAmperePeriodMs;
+    private Double rmsVoltPeriodMs = 10d;
+    private Double rmsAmperePeriodMs = 10d;
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();

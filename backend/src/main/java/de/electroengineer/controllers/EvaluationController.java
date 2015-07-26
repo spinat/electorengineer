@@ -39,7 +39,7 @@ public class EvaluationController {
 
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
 
-        evaluationService.generatePreviewData(evaluation);
+//        evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
     }
