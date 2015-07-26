@@ -49,7 +49,8 @@ public class ImportService {
 
         //Import Group
         for(String key : evaluations.keySet()) {
-            Evaluation evaluation = createEvaluation(evaluations.get(key));
+            List<Path> files = evaluations.get(key);
+            Evaluation evaluation = createEvaluation(files);
             if(evaluation == null) {
                 continue;
             }
@@ -58,6 +59,14 @@ public class ImportService {
             evaluationService.calc(evaluation);
             fileService.storeEvaluation(evaluation);
 
+            files.stream()
+                    .forEach((path) -> {
+                        try {
+                            Files.delete(path);
+                        } catch (IOException e) {
+                            LOG.error(e.getMessage());
+                        }
+                    });
         }
     }
 
