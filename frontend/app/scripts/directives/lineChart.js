@@ -171,7 +171,7 @@ angular.module('frontendApp')
 
       },
 
-      templateUrl: 'scripts/directives/lineChart.html',
+      templateUrl: 'views/lineChart.html',
 
       scope: {
         evaluation: '='
