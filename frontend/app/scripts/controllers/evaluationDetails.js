@@ -17,4 +17,8 @@ angular.module('frontendApp')
         });
     };
 
+    $scope.normalize = function() {
+      $log.info('normalize', $scope.bla);
+    };
+
   });

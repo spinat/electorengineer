@@ -23,6 +23,10 @@
         <td>L</td>
         <td>{{evaluation.l * 1e6 | number:2}} µH</td>
       </tr>
+      <tr>
+        <td>Schnittpunkt</td>
+        <td>X ms</td>
+      </tr>
       <!--<tr>-->
         <!--<td>TStart</td>-->
         <!--<td>{{evaluation.calculationCoordinates.tStart.time}}</td>-->
@@ -39,6 +43,14 @@
 
   </div>
   <div class="col-xs-6">
+    <div>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="1" ng-change="normalize()">Normal</label>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="2" ng-change="normalize()">RMS</label>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="3" ng-change="normalize()">Maximum</label>
+    </div>
+
+    <hr />
+
     <form class="form-horizontal" novalidate ng-submit="calculate()" method="post">
       <div class="form-group">
         <label class="col-sm-6 control-label">Spannungsabstand (ms)</label>
@@ -58,6 +70,7 @@
         </div>
       </div>
     </form>
+
   </div>
 </div>
 
