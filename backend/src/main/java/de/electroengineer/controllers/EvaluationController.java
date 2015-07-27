@@ -48,7 +48,7 @@ public class EvaluationController {
     }
 
     @RequestMapping(value = API_EVALUATION_CALC, method = RequestMethod.POST)
-    public Evaluation calculate(@PathVariable("evaluationName") String evaluationName,
+    public void calculate(@PathVariable("evaluationName") String evaluationName,
                                 @PathVariable("rmsAmperePeriodMs") Double rmsAmperePeriodMs,
                                 @PathVariable("rmsVoltPeriodMs") Double rmsVoltPeriodMs) throws IOException {
 
@@ -61,10 +61,6 @@ public class EvaluationController {
 
         evaluationService.calc(evaluation);
         fileService.storeEvaluation(evaluation);
-
-        evaluationService.generatePreviewData(evaluation);
-
-        return evaluation;
     }
 
     @RequestMapping(value = API_EVALUATION_NORMALIZE, method = RequestMethod.POST)
