@@ -46,6 +46,8 @@ public class EvaluationService {
 
     public Evaluation calc(Evaluation evaluation) {
 
+        evaluation.getCalculationCoordinates().clear();
+
         //tStart
         Coordinate tStartCoordinate = findT1StartCoordinate(evaluation);
         evaluation.addCalculationPoint("tStart", tStartCoordinate);
@@ -95,13 +97,14 @@ public class EvaluationService {
 
         List<Coordinate> collect = normalizeCoordinates.stream()
                 .skip(normalizeCoordinates.size() / 2)
-                .filter(coordinate -> Math.abs(coordinate.getAmpere() - coordinate.getVolt()) < 0.25)
+                .filter(coordinate -> Math.abs(coordinate.getAmpere() - coordinate.getVolt()) < 0.1)
                 .collect(Collectors.toList());
 
         if(collect.size() == 0) {
             LOG.info("Can't find intersection. Evaluation={}", evaluation.getEvaluationName());
             return null;
         }
+
         Coordinate intersectionCoordinate = collect.get(collect.size() / 2);
 
         Coordinate coordinate1 = evaluation.getData().stream()
