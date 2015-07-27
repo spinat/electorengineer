@@ -29,4 +29,13 @@ public class Coordinate {
     public void setAmpere(double ampere) {
         this.ampere = ampere;
     }
+
+    @Override
+    public String toString() {
+        return "Coordinate{" +
+                "time=" + time +
+                ", volt=" + volt +
+                ", ampere=" + ampere +
+                '}';
+    }
 }

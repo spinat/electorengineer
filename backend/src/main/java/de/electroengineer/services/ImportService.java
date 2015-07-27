@@ -161,7 +161,7 @@ public class ImportService {
 
     private static HashMap<String, Object> extractMetaDataFromFile(Path path) {
         HashMap<String, Object> metaData = new HashMap<String, Object>();
-        try(Stream<String> lines = Files.lines(path).onClose(() -> LOG.info("File closed!"))) {
+        try(Stream<String> lines = Files.lines(path)) {
             lines
                     .map((line) -> Arrays.asList(line.split("=")))
                     .filter((data) -> data.size() == 2)

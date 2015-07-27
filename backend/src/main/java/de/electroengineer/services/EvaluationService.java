@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 
 @Service
@@ -89,7 +90,27 @@ public class EvaluationService {
     }
 
     private Double findIntersection(Evaluation evaluation) {
-        return 121212d;
+
+        List<Coordinate> normalizeCoordinates = normalize(evaluation, evaluation.getRmsVolt(), evaluation.getRmsAmpere());
+
+        List<Coordinate> collect = normalizeCoordinates.stream()
+                .skip(normalizeCoordinates.size() / 2)
+                .filter(coordinate -> Math.abs(coordinate.getAmpere() - coordinate.getVolt()) < 0.25)
+                .collect(Collectors.toList());
+
+        if(collect.size() == 0) {
+            LOG.info("Can't find intersection. Evaluation={}", evaluation.getEvaluationName());
+            return null;
+        }
+        Coordinate intersectionCoordinate = collect.get(collect.size() / 2);
+
+        Coordinate coordinate1 = evaluation.getData().stream()
+                .filter(coordinate -> Double.compare(coordinate.getTime(), intersectionCoordinate.getTime()) == 0)
+                .findFirst()
+                .get();
+
+        evaluation.addCalculationPoint("v_intersection", coordinate1);
+        return intersectionCoordinate.getTime();
     }
 
     private double rmsVolt(Evaluation evaluation, double seconds) {
@@ -262,19 +283,29 @@ public class EvaluationService {
                 return;
         }
 
-        List<Coordinate> normedValues = evaluation.getData().stream()
-                .map(coordinate -> {
-                    double voltNormed = coordinate.getVolt() * 100.0f / _100PercentVolt;
-                    coordinate.setVolt(voltNormed);
+        List<Coordinate> normedValues = normalize(evaluation, _100PercentVolt, _100PercentAmpere);
 
-                    double ampereNormed = coordinate.getAmpere() * 100.0f / _100PercentAmpere;
-                    coordinate.setAmpere(ampereNormed);
-
-                    return coordinate;
-                })
-                .collect(Collectors.toList());
         evaluation.setData(normedValues);
 
+    }
+
+    private static List<Coordinate> normalize(Evaluation evaluation, Double _100PercentVolt, Double _100PercentAmpere) {
+
+        List<Coordinate> collect = evaluation.getData().stream()
+                .map(coordinate -> {
+                    double voltNormed = coordinate.getVolt() * 100.0f / _100PercentVolt;
+                    double ampereNormed = coordinate.getAmpere() * 100.0f / _100PercentAmpere;
+
+                    Coordinate newCoordinate = new Coordinate();
+                    newCoordinate.setVolt(voltNormed);
+                    newCoordinate.setAmpere(ampereNormed);
+                    newCoordinate.setTime(coordinate.getTime());
+
+                    return newCoordinate;
+                })
+                .collect(Collectors.toList());
+
+        return collect;
     }
 
     public double findMaxVolt(Evaluation evaluation) {
