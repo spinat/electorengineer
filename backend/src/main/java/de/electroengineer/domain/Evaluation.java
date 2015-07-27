@@ -18,6 +18,7 @@ public class Evaluation {
     private Double t2;
     private Double voltMax;
     private Double ampereMax;
+    private Double intersection;
 
     private Double rmsVoltPeriodMs = 10d;
     private Double rmsAmperePeriodMs = 10d;
@@ -26,6 +27,14 @@ public class Evaluation {
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
+
+    public Double getIntersection() {
+        return intersection;
+    }
+
+    public void setIntersection(Double intersection) {
+        this.intersection = intersection;
+    }
 
     public NormalizeType getNormalizeMode() {
         return normalizeMode;

@@ -81,7 +81,15 @@ public class EvaluationService {
         //L
         evaluation.setL(t1 * r);
 
+        //Intersection
+        Double intersection = findIntersection(evaluation);
+        evaluation.setIntersection(intersection);
+
         return evaluation;
+    }
+
+    private Double findIntersection(Evaluation evaluation) {
+        return 121212d;
     }
 
     private double rmsVolt(Evaluation evaluation, double seconds) {
