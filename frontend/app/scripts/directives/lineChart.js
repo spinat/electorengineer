@@ -80,7 +80,7 @@ angular.module('frontendApp')
         .attr('y', 6)
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
-        .text('Spannung (V)');
+        .text('Spannung' + (evaluation.normalizeMode === 'NORMAL' ? ' (V)' : ' (%)'));
 
       svg.append('g')
         .attr('class', 'y axis')
@@ -90,7 +90,7 @@ angular.module('frontendApp')
         .attr('transform', 'rotate(90)')
         .attr('y', 6)
         .attr('dy', '.71em')
-        .text('Strom (A)');
+        .text('Strom' + (evaluation.normalizeMode === 'NORMAL' ? ' (A)' : ' (%)'));
     }
 
     function drawData(evaluation) {

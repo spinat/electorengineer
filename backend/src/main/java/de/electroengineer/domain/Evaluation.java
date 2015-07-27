@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class Evaluation {
 
+    public enum NormalizeType { NORMAL, RMS, MAX }
+
     private String evaluationName;
     private Double rmsAmpere;
     private Double rmsVolt;
@@ -14,13 +16,40 @@ public class Evaluation {
     private Double l;
     private Double t1;
     private Double t2;
+    private Double voltMax;
+    private Double ampereMax;
 
     private Double rmsVoltPeriodMs = 10d;
     private Double rmsAmperePeriodMs = 10d;
+    private NormalizeType normalizeMode = NormalizeType.NORMAL;
 
     private List<Measure> measures = new ArrayList<>();
     private List<Coordinate> data = new ArrayList<>();
     private Map<String, Coordinate> calculationCoordinates = new HashMap<>();
+
+    public NormalizeType getNormalizeMode() {
+        return normalizeMode;
+    }
+
+    public void setNormalizeMode(NormalizeType normalizeMode) {
+        this.normalizeMode = normalizeMode;
+    }
+
+    public Double getVoltMax() {
+        return voltMax;
+    }
+
+    public void setVoltMax(Double voltMax) {
+        this.voltMax = voltMax;
+    }
+
+    public Double getAmpereMax() {
+        return ampereMax;
+    }
+
+    public void setAmpereMax(Double ampereMax) {
+        this.ampereMax = ampereMax;
+    }
 
     public Double getRmsVoltPeriodMs() {
         return rmsVoltPeriodMs;

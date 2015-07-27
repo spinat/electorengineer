@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+
 @Service
 public class EvaluationService {
 
@@ -30,6 +31,7 @@ public class EvaluationService {
     }
     
     public void generatePreviewData(Evaluation evaluation) {
+
         int countMeasurePoints = evaluation.getData().size();
         int skip = countMeasurePoints / 1000;
 
@@ -203,38 +205,6 @@ public class EvaluationService {
 
     private Coordinate findT1StartCoordinate(Evaluation evaluation) {
 
-//        List<Coordinate> evaluationData = evaluation.getData();
-//        Double sampleInterval = evaluation.getMeasures().get(0).getSampleIntervall();
-//
-//
-//        //---------- Sliding Window - Find T1 Coordinate -------------------
-//        int windowSize = 1000;
-//        int slideStep = 10;
-//        Integer stopValue = null;
-//
-//        System.out.println("Start");
-//        for(int currentStartWindow = 0; currentStartWindow < evaluationData.size() / 2; currentStartWindow += slideStep) {
-//            //Collect Data in Window
-//            int currentEndWindow = currentStartWindow + windowSize;
-//
-//            SimpleRegression regression = collectWindowData(evaluation, currentStartWindow, currentEndWindow);
-//
-//            double mean = IntStream.range(currentStartWindow, currentEndWindow)
-//                    .mapToDouble(i -> evaluationData.get(i).getAmpere())
-//                    .average()
-//                    .getAsDouble();
-//
-//            if(currentStartWindow == 0) {
-//                stopValue = (int) mean + 1;
-//            }
-//
-//            System.out.println(mean);
-//            if(mean >= stopValue) {
-//                evaluation.addCalculationPoint("t1_new", evaluationData.get(currentEndWindow));
-//                break;
-//            }
-//        }
-
         Double totalMaxAmpere = evaluation.getData().parallelStream()
                 .max((v1, v2) -> Double.compare(v1.getAmpere(), v2.getAmpere()))
                 .get()
@@ -261,5 +231,56 @@ public class EvaluationService {
                 .getAsInt();
 
         return evaluation.getData().get(firstIndex-16);
+    }
+
+    public void normalizesData(Evaluation evaluation) {
+
+        Double _100PercentVolt;
+        Double _100PercentAmpere;
+
+        switch (evaluation.getNormalizeMode()) {
+            case MAX:
+                LOG.info("Normalisiere auf das Maximum");
+                _100PercentAmpere = evaluation.getAmpereMax();
+                _100PercentVolt = evaluation.getVoltMax();
+                break;
+            case RMS:
+                LOG.info("Normalisiere auf RMS");
+                _100PercentAmpere = evaluation.getRmsAmpere();
+                _100PercentVolt = evaluation.getRmsVolt();
+                break;
+            default:
+                LOG.info("Wende keine Normalisierung an");
+                return;
+        }
+
+        List<Coordinate> normedValues = evaluation.getData().stream()
+                .map(coordinate -> {
+                    double voltNormed = coordinate.getVolt() * 100.0f / _100PercentVolt;
+                    coordinate.setVolt(voltNormed);
+
+                    double ampereNormed = coordinate.getAmpere() * 100.0f / _100PercentAmpere;
+                    coordinate.setAmpere(ampereNormed);
+
+                    return coordinate;
+                })
+                .collect(Collectors.toList());
+        evaluation.setData(normedValues);
+
+    }
+
+    public double findMaxVolt(Evaluation evaluation) {
+        return evaluation.getData().stream()
+                .limit(evaluation.getData().size() / 2)
+                .max((o1, o2) -> Double.compare(o1.getVolt(), o2.getVolt()))
+                .get()
+                .getVolt();
+    }
+
+    public double findMaxAmpere(Evaluation evaluation) {
+        return evaluation.getData().stream()
+                .max((o1, o2) -> Double.compare(o1.getAmpere(), o2.getAmpere()))
+                .get()
+                .getAmpere();
     }
 }

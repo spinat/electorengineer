@@ -4,6 +4,14 @@
   <div class="col-xs-6">
     <table class="table">
       <tr>
+        <td>Max Spannung (Links)</td>
+        <td>{{evaluation.voltMax | number:2}} V</td>
+      </tr>
+      <tr>
+        <td>Max Strom</td>
+        <td>{{evaluation.ampereMax | number:2}} A</td>
+      </tr>
+      <tr>
         <td>Spannung RMS</td>
         <td>{{evaluation.rmsVolt | number:2}} V</td>
       </tr>
@@ -27,26 +35,14 @@
         <td>Schnittpunkt</td>
         <td>X ms</td>
       </tr>
-      <!--<tr>-->
-        <!--<td>TStart</td>-->
-        <!--<td>{{evaluation.calculationCoordinates.tStart.time}}</td>-->
-      <!--</tr>-->
-      <!--<tr>-->
-        <!--<td>T63</td>-->
-        <!--<td>{{evaluation.calculationCoordinates.t63.time}}</td>-->
-      <!--</tr>-->
-      <!--<tr>-->
-        <!--<td>T2</td>-->
-        <!--<td>{{evaluation.t2}}</td>-->
-      </tr>
     </table>
 
   </div>
   <div class="col-xs-6">
     <div>
-      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="1" ng-change="normalize()">Normal</label>
-      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="2" ng-change="normalize()">RMS</label>
-      <label class="radio-inline"><input type="radio" name="optradio" ng-model="bla" value="3" ng-change="normalize()">Maximum</label>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="evaluation.normalizeMode" value="NORMAL" ng-change="normalize()">Normal</label>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="evaluation.normalizeMode" value="RMS" ng-change="normalize()">RMS</label>
+      <label class="radio-inline"><input type="radio" name="optradio" ng-model="evaluation.normalizeMode" value="MAX" ng-change="normalize()">Maximum</label>
     </div>
 
     <hr />
@@ -75,3 +71,5 @@
 </div>
 
 <line-chart evaluation="evaluation"></line-chart>
+
+<h3>Zoom auf Auschalten</h3>

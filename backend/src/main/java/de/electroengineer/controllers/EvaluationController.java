@@ -17,6 +17,8 @@ public class EvaluationController {
     public static final String API_EVALUATION_SHOW = "/api/evaluation/{evaluationName}";
     public static final String API_EVALUATION_LIST = "/api/evaluation/list";
     public static final String API_EVALUATION_CALC = "/api/evaluation/{evaluationName}/calc/{rmsAmperePeriodMs}/{rmsVoltPeriodMs}";
+    public static final String API_EVALUATION_NORMALIZE = "/api/evaluation/{evaluationName}/normalize/{normalizeMode}";
+
     private static Logger LOG = LoggerFactory.getLogger(EvaluationController.class);
 
     @Autowired
@@ -40,6 +42,7 @@ public class EvaluationController {
         Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
 
         evaluationService.generatePreviewData(evaluation);
+        evaluationService.normalizesData(evaluation);
 
         return evaluation;
     }
@@ -62,5 +65,16 @@ public class EvaluationController {
         evaluationService.generatePreviewData(evaluation);
 
         return evaluation;
+    }
+
+    @RequestMapping(value = API_EVALUATION_NORMALIZE, method = RequestMethod.POST)
+    public void updateNormalizeType(@PathVariable("evaluationName") String evaluationName,
+                                    @PathVariable("normalizeMode") String normalizeMode) throws IOException {
+
+        LOG.info("Requet to {}. evaluationName={}, normalizeMode={}", API_EVALUATION_CALC, evaluationName, normalizeMode);
+
+        Evaluation evaluation = evaluationService.getEvaluation(evaluationName);
+        evaluation.setNormalizeMode(Evaluation.NormalizeType.valueOf(normalizeMode));
+        fileService.storeEvaluation(evaluation);
     }
 }

@@ -70,6 +70,10 @@ public class FileService {
             sb.append(line);
         }
 
+        br.close();
+        decoder.close();
+        in.close();
+
         return sb.toString();
     }
 

@@ -56,6 +56,12 @@ public class ImportService {
             }
             fileService.storeEvaluation(evaluation);
 
+            double maxAmpere = evaluationService.findMaxAmpere(evaluation);
+            evaluation.setAmpereMax(maxAmpere);
+
+            double maxVolt = evaluationService.findMaxVolt(evaluation);
+            evaluation.setVoltMax(maxVolt);
+
             evaluationService.calc(evaluation);
             fileService.storeEvaluation(evaluation);
 

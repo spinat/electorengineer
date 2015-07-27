@@ -48,5 +48,20 @@ angular.module('frontendApp')
       return deferred.promise;
     };
 
+    evaluationService.updateNormalizeMode = function(evaluationName, normalizeMode) {
+
+      var deferred = $q.defer();
+
+      $http.post('http://localhost:8080/api/evaluation/'+evaluationName+'/normalize/' + normalizeMode)
+        .success(function(response) {
+          deferred.resolve(response);
+        })
+        .error(function(response) {
+          deferred.reject(response);
+        });
+
+      return deferred.promise;
+    };
+
     return evaluationService;
   });

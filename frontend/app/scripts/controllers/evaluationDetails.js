@@ -18,7 +18,12 @@ angular.module('frontendApp')
     };
 
     $scope.normalize = function() {
-      $log.info('normalize', $scope.bla);
+      $log.info('normalize', $scope.evaluation);
+
+      EvaluationService.updateNormalizeMode(Evaluation.evaluationName, $scope.evaluation.normalizeMode)
+        .then(function() {
+          $route.reload();
+        });
     };
 
   });
