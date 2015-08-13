@@ -11,3 +11,4 @@ buildNumber.properties
 .mvn/timing.properties
 
 backend.iml
+src/main/resources/static
