@@ -28,4 +28,4 @@ dist/
 .sass-cache
 *.css.map
 
-frontend.iml
+*.iml

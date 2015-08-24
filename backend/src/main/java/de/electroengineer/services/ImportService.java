@@ -62,7 +62,13 @@ public class ImportService {
             double maxVolt = evaluationService.findMaxVolt(evaluation);
             evaluation.setVoltMax(maxVolt);
 
-            evaluationService.calc(evaluation);
+            try {
+                evaluationService.calc(evaluation);
+            } catch (Exception e) {
+                LOG.info("Die Berechnugn war Fehlerhaft. Sie wird trotzdem abgespeichert.");
+            }
+
+
             fileService.storeEvaluation(evaluation);
 
             files.stream()
