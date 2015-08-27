@@ -57,15 +57,35 @@ angular.module('frontendApp')
         _.max(evaluation.data, 'time').time
       ]);
 
-      scaleVolt.domain([
-        _.min(evaluation.data, 'volt').volt,
-        _.max(evaluation.data, 'volt').volt
-      ]);
 
-      scaleAmpere.domain([
-        _.min(evaluation.data, 'ampere').ampere,
-        _.max(evaluation.data, 'ampere').ampere
-      ]);
+      if(evaluation.normalizeMode === 'NORMAL') {
+        scaleVolt.domain([
+          _.min(evaluation.data, 'volt').volt,
+          _.max(evaluation.data, 'volt').volt
+        ]);
+
+        scaleAmpere.domain([
+          _.min(evaluation.data, 'ampere').ampere,
+          _.max(evaluation.data, 'ampere').ampere
+        ]);
+      } else {
+
+        var min = 0;
+        var maxVolt = _.max(evaluation.data, 'volt').volt;
+        var maxAmpere = _.max(evaluation.data, 'ampere').ampere;
+        var max = _.max([maxVolt, maxAmpere]);
+
+        scaleVolt.domain([
+          min,
+          max
+        ]);
+
+        scaleAmpere.domain([
+          min,
+          max
+        ]);
+
+      }
 
       svg.append('g')
         .attr('class', 'x axis')
@@ -118,6 +138,7 @@ angular.module('frontendApp')
 
       controller: function($scope, $log, $element) {
         $log.info('Start', $element, d3, margin, width, height, $scope.evaluation);
+
 
         $scope.download = function() {
           $log.info('Download..');
@@ -179,7 +200,7 @@ angular.module('frontendApp')
 
         circles
           .attr('class', 'circle')
-          .attr('cx', function (d) { return scaleTime(d.time); })
+          .attr('cx', function (d) { return scaleTime(d.time*1000); })
           .attr('cy', function (d) {
             if(d.name.startsWith('v_')) {
               return scaleVolt(d.volt);

@@ -3,3 +3,6 @@ spool
 .idea
 
 *.log
+
+/jenkins
+jenkins

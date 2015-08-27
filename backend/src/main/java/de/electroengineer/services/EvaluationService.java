@@ -41,6 +41,9 @@ public class EvaluationService {
                 .mapToObj(i -> evaluation.getData().get(i))
                 .collect(Collectors.toList());
 
+        coordinates.stream()
+                .forEach(coordinate -> coordinate.setTime(coordinate.getTime()*1000));
+
         evaluation.setData(coordinates);
     }
 
@@ -85,13 +88,14 @@ public class EvaluationService {
         evaluation.setL(t1 * r);
 
         //Intersection
-        Double intersection = findIntersection(evaluation);
-        evaluation.setIntersection(intersection);
+        Coordinate intersection = findIntersection(evaluation);
+        evaluation.setIntersection(intersection.getTime());
+        evaluation.setIntersectionPercent(intersection.getVolt());
 
         return evaluation;
     }
 
-    private Double findIntersection(Evaluation evaluation) {
+    private Coordinate findIntersection(Evaluation evaluation) {
 
         List<Coordinate> normalizeCoordinates = normalize(evaluation, evaluation.getRmsVolt(), evaluation.getRmsAmpere());
 
@@ -107,13 +111,7 @@ public class EvaluationService {
 
         Coordinate intersectionCoordinate = collect.get(collect.size() / 2);
 
-        Coordinate coordinate1 = evaluation.getData().stream()
-                .filter(coordinate -> Double.compare(coordinate.getTime(), intersectionCoordinate.getTime()) == 0)
-                .findFirst()
-                .get();
-
-        evaluation.addCalculationPoint("v_intersection", coordinate1);
-        return intersectionCoordinate.getTime();
+        return intersectionCoordinate;
     }
 
     private double rmsVolt(Evaluation evaluation, double seconds) {

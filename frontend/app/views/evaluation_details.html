@@ -33,7 +33,10 @@
       </tr>
       <tr>
         <td>Schnittpunkt</td>
-        <td>{{evaluation.intersection * 1000 | number:2}} ms</td>
+        <td>
+          <p>{{evaluation.intersection * 1000 | number:2}} ms</p>
+          <p>{{evaluation.intersectionPercent | number:2}} %</p>
+        </td>
       </tr>
     </table>
 
@@ -71,5 +74,3 @@
 </div>
 
 <line-chart evaluation="evaluation"></line-chart>
-
-<h3>Zoom auf Auschalten</h3>
